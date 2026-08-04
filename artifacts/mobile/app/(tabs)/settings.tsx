@@ -39,11 +39,11 @@ export default function SettingsScreen() {
   };
 
   const handleTerms = () => {
-    Alert.alert('الشروط والأحكام', 'يرجى قراءة شروط وأحكام استخدام منصة ناشي بعناية.');
+    Alert.alert('الشروط والأحكام', 'يرجى قراءة شروط وأحكام استخدام منصة ناشئ بعناية.');
   };
 
   const handleLogout = () => {
-    Alert.alert('تسجيل الخروج', 'هل تريد تسجيل الخروج من ناشي؟', [
+    Alert.alert('تسجيل الخروج', 'هل تريد تسجيل الخروج من ناشئ؟', [
       { text: 'إلغاء', style: 'cancel' },
       {
         text: 'تسجيل الخروج',
@@ -140,7 +140,7 @@ export default function SettingsScreen() {
 
       {/* Version */}
       <View style={[sStyles.versionRow, { paddingBottom: bottomPad + 100 }]}>
-        <Text style={sStyles.versionText}>ناشي v1.0.0</Text>
+        <Text style={sStyles.versionText}>ناشئ v1.0.0</Text>
       </View>
     </View>
   );

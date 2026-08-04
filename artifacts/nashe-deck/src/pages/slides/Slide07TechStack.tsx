@@ -265,7 +265,7 @@ export default function Slide07TechStack() {
         }}
       >
         <div style={{ display: "flex", gap: "1.5vw" }}>
-          <span>ناشي — Nashe</span>
+          <span>ناشئ — NASHE</span>
           <span>/</span>
           <span>Platform Overview</span>
         </div>

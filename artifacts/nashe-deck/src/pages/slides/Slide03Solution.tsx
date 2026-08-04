@@ -113,7 +113,7 @@ export default function Slide03Solution() {
             }}
           />
           <div style={{ fontSize: "1.2vw", fontWeight: 700, color: "white" }}>
-            ناشي — Nashe
+            ناشئ — NASHE
           </div>
         </div>
       </div>
@@ -139,7 +139,7 @@ export default function Slide03Solution() {
             maxWidth: "72vw",
           }}
         >
-          A mobile-first Arabic platform that connects football scouts with emerging talent across the Arab world
+          A mobile-first Arabic platform that connects youth coaches and clubs with emerging talent — across all sports, for boys and girls
           <span style={{ color: "#F97316" }}>.</span>
         </h1>
 
@@ -172,7 +172,7 @@ export default function Slide03Solution() {
               }}
             />
             <p style={{ fontSize: "1.6vw", color: "rgba(255,255,255,0.75)", margin: 0, fontWeight: 500, lineHeight: 1.4 }}>
-              Player profiles
+              Athlete profiles
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "flex-start", gap: "1vw" }}>
@@ -188,6 +188,21 @@ export default function Slide03Solution() {
             />
             <p style={{ fontSize: "1.6vw", color: "rgba(255,255,255,0.75)", margin: 0, fontWeight: 500, lineHeight: 1.4 }}>
               Curated discovery feed
+            </p>
+          </div>
+          <div style={{ display: "flex", alignItems: "flex-start", gap: "1vw" }}>
+            <div
+              style={{
+                width: "0.5vw",
+                height: "0.5vw",
+                borderRadius: "50%",
+                backgroundColor: "#F97316",
+                marginTop: "0.9vw",
+                flexShrink: 0,
+              }}
+            />
+            <p style={{ fontSize: "1.6vw", color: "rgba(255,255,255,0.75)", margin: 0, fontWeight: 500, lineHeight: 1.4 }}>
+              All sports
             </p>
           </div>
         </div>
@@ -206,7 +221,7 @@ export default function Slide03Solution() {
         }}
       >
         <div style={{ display: "flex", gap: "1.5vw" }}>
-          <span>ناشي — Nashe</span>
+          <span>ناشئ — NASHE</span>
           <span>/</span>
           <span>Platform Overview</span>
           <span>/</span>

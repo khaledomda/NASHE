@@ -16,34 +16,35 @@ import { useColors } from '@/hooks/useColors';
 
 // ─── Mock data ───────────────────────────────────────────────────────────────
 
-const FEATURED_PLAYER = {
+const FEATURED_ATHLETE = {
   id: '1',
-  name: 'فيصل الجريني',
-  position: 'مهاجم',
+  name: 'سارة العتيبي',
+  sport: 'سباحة',
   region: 'الرياض',
-  age: 19,
+  age: 16,
+  gender: 'أنثى',
   avatarColor: '#2ECC71',
 };
 
-const PLAYERS = [
-  { id: '1', name: 'فيصل الجريني', position: 'مهاجم', avatarColor: '#2ECC71' },
-  { id: '2', name: 'أحمد الفيفي', position: 'مدافع', avatarColor: '#45B7D1' },
-  { id: '3', name: 'عمر الزهراني', position: 'حارس', avatarColor: '#FF6B6B' },
-  { id: '4', name: 'خالد المطيري', position: 'وسط', avatarColor: '#F59E0B' },
-  { id: '5', name: 'سامي العنبر', position: 'جناح', avatarColor: '#9B59B6' },
+const ATHLETES = [
+  { id: '1', name: 'سارة العتيبي', sport: 'سباحة', avatarColor: '#2ECC71' },
+  { id: '2', name: 'فيصل الجريني', sport: 'كرة القدم', avatarColor: '#45B7D1' },
+  { id: '3', name: 'نورة الشمري', sport: 'ألعاب قوى', avatarColor: '#FF6B6B' },
+  { id: '4', name: 'خالد المطيري', sport: 'كرة السلة', avatarColor: '#F59E0B' },
+  { id: '5', name: 'ريم الزهراني', sport: 'تنس', avatarColor: '#9B59B6' },
 ];
 
 const CLIPS = [
-  { id: '1', playerName: 'فيصل الجريني', duration: '90 ث', date: '1 أغسطس', color: '#1B5E3B' },
-  { id: '2', playerName: 'أحمد الفيفي', duration: '45 ث', date: '28 يوليو', color: '#145232' },
-  { id: '3', playerName: 'عمر الزهراني', duration: '120 ث', date: '25 يوليو', color: '#0D3D25' },
-  { id: '4', playerName: 'خالد المطيري', duration: '60 ث', date: '20 يوليو', color: '#1B5E3B' },
+  { id: '1', athleteName: 'سارة العتيبي', sport: 'سباحة', duration: '90 ث', date: '1 أغسطس', color: '#1B5E3B' },
+  { id: '2', athleteName: 'فيصل الجريني', sport: 'كرة القدم', duration: '45 ث', date: '28 يوليو', color: '#145232' },
+  { id: '3', athleteName: 'نورة الشمري', sport: 'ألعاب قوى', duration: '120 ث', date: '25 يوليو', color: '#0D3D25' },
+  { id: '4', athleteName: 'خالد المطيري', sport: 'كرة السلة', duration: '60 ث', date: '20 يوليو', color: '#1B5E3B' },
 ];
 
 const NEWS = [
   { id: '1', text: 'تم تحديث نظام رفع الفيديوهات لتسريع الأداء' },
-  { id: '2', text: 'أضف اللاعب الجديد الآن قبل نهاية فترة التسجيل' },
-  { id: '3', text: 'انطلاق دوري الموسم الجديد لاكتشاف المواهب' },
+  { id: '2', text: 'أضف موهبتك الجديدة الآن قبل نهاية فترة التسجيل' },
+  { id: '3', text: 'انطلاق موسم اكتشاف المواهب الشبابية في جميع الرياضات' },
 ];
 
 // ─── Sub-components ────────────────────────────────────────────────────────
@@ -58,20 +59,20 @@ function SectionHeader({ title, icon }: { title: string; icon: React.ReactNode }
   );
 }
 
-function FeaturedPlayerCard() {
+function FeaturedAthleteCard() {
   const colors = useColors();
-  const initials = FEATURED_PLAYER.name.split(' ').map((w) => w[0]).join('');
+  const initials = FEATURED_ATHLETE.name.split(' ').map((w) => w[0]).join('');
   return (
     <View style={[sStyles.featuredCard, { backgroundColor: colors.card, borderColor: colors.border }]}>
-      <View style={[sStyles.featuredAvatar, { backgroundColor: FEATURED_PLAYER.avatarColor }]}>
+      <View style={[sStyles.featuredAvatar, { backgroundColor: FEATURED_ATHLETE.avatarColor }]}>
         <Text style={sStyles.featuredInitials}>{initials}</Text>
       </View>
       <View style={sStyles.featuredInfo}>
         <Text style={[sStyles.featuredName, { color: colors.foreground }]} numberOfLines={1}>
-          {FEATURED_PLAYER.name}
+          {FEATURED_ATHLETE.name}
         </Text>
         <Text style={[sStyles.featuredSub, { color: colors.mutedForeground }]}>
-          {FEATURED_PLAYER.position} · {FEATURED_PLAYER.region}
+          {FEATURED_ATHLETE.sport} · {FEATURED_ATHLETE.region} · {FEATURED_ATHLETE.gender}
         </Text>
       </View>
       <Ionicons name="star" size={22} color={colors.accent} />
@@ -80,7 +81,6 @@ function FeaturedPlayerCard() {
 }
 
 function ClipCard({ item }: { item: typeof CLIPS[0] }) {
-  const colors = useColors();
   return (
     <Pressable
       style={({ pressed }) => [
@@ -92,16 +92,16 @@ function ClipCard({ item }: { item: typeof CLIPS[0] }) {
         <Ionicons name="play-circle" size={36} color="rgba(255,255,255,0.9)" />
       </View>
       <View style={sStyles.clipMeta}>
-        <Text style={sStyles.clipDuration}>{item.duration}</Text>
+        <Text style={sStyles.clipDuration}>{item.duration} · {item.sport}</Text>
         <Text style={sStyles.clipPlayer} numberOfLines={1}>
-          {item.playerName}
+          {item.athleteName}
         </Text>
       </View>
     </Pressable>
   );
 }
 
-function PlayerCircle({ item }: { item: typeof PLAYERS[0] }) {
+function AthleteCircle({ item }: { item: typeof ATHLETES[0] }) {
   const colors = useColors();
   const initials = item.name.split(' ').map((w) => w[0]).join('');
   return (
@@ -111,6 +111,9 @@ function PlayerCircle({ item }: { item: typeof PLAYERS[0] }) {
       </View>
       <Text style={[sStyles.playerCircleName, { color: colors.mutedForeground }]} numberOfLines={2}>
         {item.name}
+      </Text>
+      <Text style={[sStyles.playerCircleSport, { color: colors.mutedForeground }]} numberOfLines={1}>
+        {item.sport}
       </Text>
     </View>
   );
@@ -160,13 +163,13 @@ export default function HomeScreen() {
           <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={colors.primary} />
         }
       >
-        {/* Featured Player */}
+        {/* Featured Athlete */}
         <View style={styles.section}>
           <SectionHeader
-            title="اللاعب المميز"
+            title="الموهبة المميزة"
             icon={<Ionicons name="star" size={18} color={colors.accent} style={{ marginRight: 6 }} />}
           />
-          <FeaturedPlayerCard />
+          <FeaturedAthleteCard />
         </View>
 
         {/* Latest Clips */}
@@ -187,10 +190,10 @@ export default function HomeScreen() {
           />
         </View>
 
-        {/* New Players */}
+        {/* New Athletes */}
         <View style={styles.section}>
           <SectionHeader
-            title="لاعبون جدد"
+            title="مواهب جديدة"
             icon={
               <MaterialCommunityIcons
                 name="account-star-outline"
@@ -201,14 +204,14 @@ export default function HomeScreen() {
             }
           />
           <FlatList
-            data={PLAYERS}
+            data={ATHLETES}
             horizontal
             inverted
             showsHorizontalScrollIndicator={false}
             keyExtractor={(item) => item.id}
-            renderItem={({ item }) => <PlayerCircle item={item} />}
+            renderItem={({ item }) => <AthleteCircle item={item} />}
             contentContainerStyle={{ paddingHorizontal: 16, gap: 16 }}
-            scrollEnabled={PLAYERS.length > 0}
+            scrollEnabled={ATHLETES.length > 0}
           />
         </View>
 
@@ -272,7 +275,7 @@ const sStyles = StyleSheet.create({
     flex: 1,
     textAlign: 'right',
   },
-  // Featured player
+  // Featured athlete
   featuredCard: {
     flexDirection: 'row-reverse',
     alignItems: 'center',
@@ -344,7 +347,7 @@ const sStyles = StyleSheet.create({
     textAlign: 'right',
     marginTop: 2,
   },
-  // Player circle
+  // Athlete circle
   playerCircleContainer: {
     alignItems: 'center',
     width: 72,
@@ -368,6 +371,13 @@ const sStyles = StyleSheet.create({
     textAlign: 'center',
     fontFamily: 'Inter_400Regular',
     lineHeight: 14,
+  },
+  playerCircleSport: {
+    fontSize: 10,
+    textAlign: 'center',
+    fontFamily: 'Inter_400Regular',
+    opacity: 0.7,
+    marginTop: 2,
   },
   // News
   newsItem: {

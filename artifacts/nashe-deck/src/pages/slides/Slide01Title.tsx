@@ -95,7 +95,7 @@ export default function Slide01Title() {
               letterSpacing: "-0.02em",
             }}
           >
-            ناشي — Nashe
+            ناشئ — NASHE
           </div>
         </div>
 
@@ -130,7 +130,7 @@ export default function Slide01Title() {
                 letterSpacing: "0.06em",
               }}
             >
-              Football Talent Discovery
+              Youth Sports Talent Platform
             </span>
           </div>
 
@@ -147,7 +147,7 @@ export default function Slide01Title() {
           >
             Discover
             <br />
-            Arab
+            Young
             <br />
             Talent
             <span style={{ color: "#F97316" }}>.</span>
@@ -164,8 +164,7 @@ export default function Slide01Title() {
               fontWeight: 400,
             }}
           >
-            Discovering Arab football talent,
-            one clip at a time.
+            Connecting youth sports talent — boys and girls — with coaches and clubs across the Arab world.
           </p>
 
           {/* Divider */}
@@ -182,7 +181,7 @@ export default function Slide01Title() {
             fontWeight: 500,
           }}
         >
-          <span>ناشي — Nashe</span>
+          <span>ناشئ — NASHE</span>
           <span>/</span>
           <span>Platform Overview</span>
           <span>/</span>
@@ -201,7 +200,6 @@ export default function Slide01Title() {
           justifyContent: "center",
         }}
       >
-        {/* Subtle circle behind image */}
         <div
           style={{
             position: "absolute",
@@ -216,9 +214,9 @@ export default function Slide01Title() {
           }}
         />
         <img
-          src={`${base}football-hero.jpg`}
+          src={`${base}sports-hero.jpg`}
           crossOrigin="anonymous"
-          alt="Football on green pitch"
+          alt="Youth athletes in various sports"
           style={{
             width: "90%",
             height: "90%",

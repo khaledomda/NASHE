@@ -96,11 +96,11 @@ export default function Slide04Features() {
             lineHeight: 1.1,
           }}
         >
-          Built for the Arab football community<span style={{ color: "#F97316" }}>.</span>
+          Built for every young athlete<span style={{ color: "#F97316" }}>.</span>
         </h1>
       </div>
 
-      {/* Feature items — top row: 3 cards, bottom row: 2 cards */}
+      {/* Feature cards */}
       <div style={{ display: "flex", flexDirection: "column", gap: "2.5vh", flex: 1, justifyContent: "center" }}>
         {/* Top 3 */}
         <div style={{ display: "flex", gap: "2.5vw" }}>
@@ -119,10 +119,10 @@ export default function Slide04Features() {
           >
             <div style={{ width: "2vw", height: "0.3vh", backgroundColor: "#1B5E3B" }} />
             <div style={{ fontSize: "1.5vw", fontWeight: 700, color: "#111827", letterSpacing: "-0.01em" }}>
-              Home Feed
+              Discovery Feed
             </div>
             <div style={{ fontSize: "1.1vw", color: "#4B5563", lineHeight: 1.4 }}>
-              Featured players, latest clips, new talent, and news — all in one curated feed.
+              Featured athletes, latest clips, rising talent, and sports news — all in one place.
             </div>
           </div>
 
@@ -144,7 +144,7 @@ export default function Slide04Features() {
               Upload Clips
             </div>
             <div style={{ fontSize: "1.1vw", color: "#4B5563", lineHeight: 1.4 }}>
-              Scouts submit player video with position, region, and detailed notes.
+              Coaches submit athlete video with sport, age, gender, and region details.
             </div>
           </div>
 
@@ -163,10 +163,10 @@ export default function Slide04Features() {
           >
             <div style={{ width: "2vw", height: "0.3vh", backgroundColor: "#1B5E3B" }} />
             <div style={{ fontSize: "1.5vw", fontWeight: 700, color: "#111827", letterSpacing: "-0.01em" }}>
-              Player Profiles
+              Athlete Profiles
             </div>
             <div style={{ fontSize: "1.1vw", color: "#4B5563", lineHeight: 1.4 }}>
-              Full stats, history, and clip gallery — one profile per player.
+              Full performance history, sport, stats, and clip gallery per athlete.
             </div>
           </div>
         </div>
@@ -201,10 +201,10 @@ export default function Slide04Features() {
             />
             <div style={{ width: "2vw", height: "0.3vh", backgroundColor: "rgba(255,255,255,0.6)" }} />
             <div style={{ fontSize: "1.5vw", fontWeight: 700, color: "white", letterSpacing: "-0.01em" }}>
-              Secure Login
+              All Sports
             </div>
             <div style={{ fontSize: "1.1vw", color: "rgba(255,255,255,0.75)", lineHeight: 1.4 }}>
-              Authenticated access for verified scouts only.
+              Football, basketball, swimming, athletics, tennis, and more — one unified platform.
             </div>
           </div>
 
@@ -226,11 +226,11 @@ export default function Slide04Features() {
               Arabic-First
             </div>
             <div style={{ fontSize: "1.1vw", color: "#4B5563", lineHeight: 1.4 }}>
-              Full RTL interface, built for the Arab football community worldwide.
+              Full RTL interface, built for the Arab youth sports community.
             </div>
           </div>
 
-          {/* Spacer to balance the 3-column top row */}
+          {/* Spacer */}
           <div style={{ flex: 1 }} />
         </div>
       </div>
@@ -250,7 +250,7 @@ export default function Slide04Features() {
         }}
       >
         <div style={{ display: "flex", gap: "1.5vw" }}>
-          <span>ناشي — Nashe</span>
+          <span>ناشئ — NASHE</span>
           <span>/</span>
           <span>Platform Overview</span>
         </div>

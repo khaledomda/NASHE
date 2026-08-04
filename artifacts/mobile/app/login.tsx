@@ -57,13 +57,13 @@ export default function LoginScreen() {
         {/* Logo */}
         <View style={styles.logoContainer}>
           <View style={styles.logoCircle}>
-            <Ionicons name="football" size={48} color="#1B5E3B" />
+            <Ionicons name="trophy" size={48} color="#1B5E3B" />
           </View>
         </View>
 
         {/* Title */}
-        <Text style={styles.appName}>ناشي</Text>
-        <Text style={styles.tagline}>منصة لاكتشاف مواهب كرة القدم</Text>
+        <Text style={styles.appName}>ناشئ</Text>
+        <Text style={styles.tagline}>منصة لاكتشاف مواهب الشباب في جميع الرياضات</Text>
 
         {/* Form */}
         <View style={styles.form}>

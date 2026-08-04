@@ -24,12 +24,12 @@ type PickerOption = { label: string; value: string };
 
 // ─── Data ────────────────────────────────────────────────────────────────────
 
-const PLAYERS: PickerOption[] = [
-  { label: 'فيصل الجريني', value: '1' },
-  { label: 'أحمد الفيفي', value: '2' },
-  { label: 'عمر الزهراني', value: '3' },
+const ATHLETES: PickerOption[] = [
+  { label: 'سارة العتيبي', value: '1' },
+  { label: 'فيصل الجريني', value: '2' },
+  { label: 'نورة الشمري', value: '3' },
   { label: 'خالد المطيري', value: '4' },
-  { label: 'سامي العنبر', value: '5' },
+  { label: 'ريم الزهراني', value: '5' },
 ];
 
 const REGIONS: PickerOption[] = [
@@ -41,12 +41,20 @@ const REGIONS: PickerOption[] = [
   { label: 'الطائف', value: 'taif' },
 ];
 
-const POSITIONS: PickerOption[] = [
-  { label: 'مهاجم', value: 'forward' },
-  { label: 'جناح', value: 'winger' },
-  { label: 'وسط', value: 'midfielder' },
-  { label: 'مدافع', value: 'defender' },
-  { label: 'حارس مرمى', value: 'goalkeeper' },
+const SPORTS: PickerOption[] = [
+  { label: 'كرة القدم', value: 'football' },
+  { label: 'كرة السلة', value: 'basketball' },
+  { label: 'السباحة', value: 'swimming' },
+  { label: 'ألعاب القوى', value: 'athletics' },
+  { label: 'التنس', value: 'tennis' },
+  { label: 'كرة الطائرة', value: 'volleyball' },
+  { label: 'الجودو', value: 'judo' },
+  { label: 'الجمباز', value: 'gymnastics' },
+];
+
+const GENDERS: PickerOption[] = [
+  { label: 'ذكر', value: 'male' },
+  { label: 'أنثى', value: 'female' },
 ];
 
 // ─── SelectPicker ─────────────────────────────────────────────────────────────
@@ -136,11 +144,12 @@ export default function UploadScreen() {
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
   const bottomPad = Platform.OS === 'web' ? 34 + 50 : 0;
 
-  const [player, setPlayer] = useState('');
-  const [playerName, setPlayerName] = useState('');
+  const [athlete, setAthlete] = useState('');
+  const [athleteName, setAthleteName] = useState('');
   const [date, setDate] = useState('');
   const [region, setRegion] = useState('');
-  const [position, setPosition] = useState('');
+  const [sport, setSport] = useState('');
+  const [gender, setGender] = useState('');
   const [description, setDescription] = useState('');
   const [photos, setPhotos] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [videos, setVideos] = useState<ImagePicker.ImagePickerAsset[]>([]);
@@ -177,7 +186,7 @@ export default function UploadScreen() {
   };
 
   const handleSubmit = async () => {
-    if (!player || !playerName.trim() || !date.trim() || !region || !position) {
+    if (!athlete || !athleteName.trim() || !date.trim() || !region || !sport || !gender) {
       Alert.alert('خطأ', 'يرجى تعبئة جميع الحقول المطلوبة');
       return;
     }
@@ -188,11 +197,12 @@ export default function UploadScreen() {
     setSubmitting(false);
     Alert.alert('تم الرفع', 'تم رفع المقطع بنجاح');
     // Reset form
-    setPlayer('');
-    setPlayerName('');
+    setAthlete('');
+    setAthleteName('');
     setDate('');
     setRegion('');
-    setPosition('');
+    setSport('');
+    setGender('');
     setDescription('');
     setPhotos([]);
     setVideos([]);
@@ -212,26 +222,26 @@ export default function UploadScreen() {
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[uStyles.scroll, { paddingBottom: bottomPad + 120 }]}
       >
-        {/* Select player */}
+        {/* Select athlete */}
         <View style={uStyles.field}>
-          <Text style={[uStyles.label, { color: colors.mutedForeground }]}>اختر لاعباً</Text>
+          <Text style={[uStyles.label, { color: colors.mutedForeground }]}>اختر رياضياً</Text>
           <SelectPicker
-            options={PLAYERS}
-            value={player}
-            placeholder="اختر لاعباً"
-            onSelect={setPlayer}
+            options={ATHLETES}
+            value={athlete}
+            placeholder="اختر رياضياً"
+            onSelect={setAthlete}
           />
         </View>
 
-        {/* Player name */}
+        {/* Athlete name */}
         <View style={uStyles.field}>
-          <Text style={[uStyles.label, { color: colors.mutedForeground }]}>اسم اللاعب</Text>
+          <Text style={[uStyles.label, { color: colors.mutedForeground }]}>اسم الرياضي</Text>
           <TextInput
             style={[uStyles.input, { backgroundColor: colors.input, borderColor: colors.border, color: colors.foreground }]}
-            placeholder="اسم اللاعب"
+            placeholder="اسم الرياضي"
             placeholderTextColor={colors.mutedForeground}
-            value={playerName}
-            onChangeText={setPlayerName}
+            value={athleteName}
+            onChangeText={setAthleteName}
             textAlign="right"
           />
         </View>
@@ -261,15 +271,26 @@ export default function UploadScreen() {
           </View>
         </View>
 
-        {/* Position */}
-        <View style={uStyles.field}>
-          <Text style={[uStyles.label, { color: colors.mutedForeground }]}>المركز</Text>
-          <SelectPicker
-            options={POSITIONS}
-            value={position}
-            placeholder="المركز"
-            onSelect={setPosition}
-          />
+        {/* Sport + Gender row */}
+        <View style={uStyles.row}>
+          <View style={[uStyles.field, { flex: 1 }]}>
+            <Text style={[uStyles.label, { color: colors.mutedForeground }]}>الرياضة</Text>
+            <SelectPicker
+              options={SPORTS}
+              value={sport}
+              placeholder="الرياضة"
+              onSelect={setSport}
+            />
+          </View>
+          <View style={[uStyles.field, { flex: 1 }]}>
+            <Text style={[uStyles.label, { color: colors.mutedForeground }]}>الجنس</Text>
+            <SelectPicker
+              options={GENDERS}
+              value={gender}
+              placeholder="الجنس"
+              onSelect={setGender}
+            />
+          </View>
         </View>
 
         {/* Description */}
@@ -281,7 +302,7 @@ export default function UploadScreen() {
               uStyles.textarea,
               { backgroundColor: colors.input, borderColor: colors.border, color: colors.foreground },
             ]}
-            placeholder="أكتب نبذة مختصرة عن اللاعب..."
+            placeholder="أكتب نبذة مختصرة عن الرياضي..."
             placeholderTextColor={colors.mutedForeground}
             value={description}
             onChangeText={setDescription}

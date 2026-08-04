@@ -109,7 +109,7 @@ export default function Slide02Problem() {
             lineHeight: 1.1,
           }}
         >
-          Talent goes unnoticed<span style={{ color: "#F97316" }}>.</span>
+          Young athletes go unseen<span style={{ color: "#F97316" }}>.</span>
         </h1>
       </div>
 
@@ -146,7 +146,7 @@ export default function Slide02Problem() {
               letterSpacing: "-0.02em",
             }}
           >
-            Thousands of talented Arab footballers go unnoticed every year
+            Thousands of youth athletes — boys and girls — go unnoticed every year
           </p>
         </div>
 
@@ -173,7 +173,7 @@ export default function Slide02Problem() {
               letterSpacing: "-0.02em",
             }}
           >
-            Scouts rely on word-of-mouth and costly in-person scouting
+            Coaches rely on word-of-mouth and expensive in-person trials
           </p>
         </div>
 
@@ -213,7 +213,7 @@ export default function Slide02Problem() {
               letterSpacing: "-0.02em",
             }}
           >
-            No dedicated Arabic-language platform exists for talent discovery
+            No Arabic-language platform exists for multi-sport youth talent
           </p>
         </div>
 
@@ -240,7 +240,7 @@ export default function Slide02Problem() {
               letterSpacing: "-0.02em",
             }}
           >
-            Young players have no easy way to showcase their skills digitally
+            Young athletes have no simple way to showcase their skills and get discovered
           </p>
         </div>
       </div>
@@ -260,7 +260,7 @@ export default function Slide02Problem() {
         }}
       >
         <div style={{ display: "flex", gap: "1.5vw" }}>
-          <span>ناشي — Nashe</span>
+          <span>ناشئ — NASHE</span>
           <span>/</span>
           <span>Platform Overview</span>
         </div>

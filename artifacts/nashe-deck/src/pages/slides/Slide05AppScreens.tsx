@@ -145,28 +145,14 @@ export default function Slide05AppScreens() {
             >
               <div style={{ width: "1.5vw", height: "1.5vw", borderRadius: "50%", backgroundColor: "rgba(255,255,255,0.5)" }} />
             </div>
-            <div style={{ fontSize: "2vw", fontWeight: 800, color: "white", marginBottom: "0.8vh" }}>ناشي</div>
+            <div style={{ fontSize: "2vw", fontWeight: 800, color: "white", marginBottom: "0.8vh" }}>ناشئ</div>
             <div style={{ fontSize: "1.1vw", color: "rgba(255,255,255,0.65)", lineHeight: 1.4 }}>
               Secure entry point with Arabic branding
             </div>
           </div>
           <div>
-            <div
-              style={{
-                backgroundColor: "rgba(255,255,255,0.12)",
-                borderRadius: "0.5vw",
-                height: "3.5vh",
-                marginBottom: "1.2vh",
-              }}
-            />
-            <div
-              style={{
-                backgroundColor: "rgba(255,255,255,0.12)",
-                borderRadius: "0.5vw",
-                height: "3.5vh",
-                marginBottom: "2vh",
-              }}
-            />
+            <div style={{ backgroundColor: "rgba(255,255,255,0.12)", borderRadius: "0.5vw", height: "3.5vh", marginBottom: "1.2vh" }} />
+            <div style={{ backgroundColor: "rgba(255,255,255,0.12)", borderRadius: "0.5vw", height: "3.5vh", marginBottom: "2vh" }} />
             <div
               style={{
                 backgroundColor: "white",
@@ -213,21 +199,16 @@ export default function Slide05AppScreens() {
             >
               <div style={{ fontSize: "1.1vw", fontWeight: 700, color: "white" }}>الرئيسية</div>
             </div>
-            <div
-              style={{
-                backgroundColor: "#F3F4F6",
-                borderRadius: "0.5vw",
-                height: "14vh",
-                marginBottom: "1.5vh",
-              }}
-            />
-            <div style={{ display: "flex", gap: "1vw", marginBottom: "1.5vh" }}>
+            <div style={{ fontSize: "0.9vw", color: "#6B7280", marginBottom: "1vh" }}>Featured Athletes</div>
+            <div style={{ backgroundColor: "#F3F4F6", borderRadius: "0.5vw", height: "12vh", marginBottom: "1.5vh" }} />
+            <div style={{ fontSize: "0.9vw", color: "#6B7280", marginBottom: "1vh" }}>Latest Clips</div>
+            <div style={{ display: "flex", gap: "1vw" }}>
               <div style={{ backgroundColor: "#F3F4F6", borderRadius: "0.5vw", height: "6vh", flex: 1 }} />
               <div style={{ backgroundColor: "#F3F4F6", borderRadius: "0.5vw", height: "6vh", flex: 1 }} />
             </div>
           </div>
           <div style={{ fontSize: "1vw", fontWeight: 700, color: "#9CA3AF", textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            Home Feed
+            Discovery Feed
           </div>
         </div>
 
@@ -290,7 +271,7 @@ export default function Slide05AppScreens() {
         }}
       >
         <div style={{ display: "flex", gap: "1.5vw" }}>
-          <span>ناشي — Nashe</span>
+          <span>ناشئ — NASHE</span>
           <span>/</span>
           <span>Platform Overview</span>
         </div>

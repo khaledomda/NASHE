@@ -3,8 +3,8 @@
     "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560001",
     "position": 1,
     "filepath": "src/pages/slides/Slide01Title.tsx",
-    "title": "ناشي — Nashe",
-    "description": "Title slide — Discovering Arab football talent, one clip at a time.",
+    "title": "ناشئ — NASHE",
+    "description": "Title slide — Connecting youth sports talent across the Arab world.",
     "speakerNotes": ""
   },
   {
@@ -12,7 +12,7 @@
     "position": 2,
     "filepath": "src/pages/slides/Slide02Problem.tsx",
     "title": "The Problem",
-    "description": "Four problem cards — hidden talent, costly scouting, no Arabic platform, no digital showcase.",
+    "description": "Young athletes — boys and girls — go unseen across all sports in the Arab world.",
     "speakerNotes": ""
   },
   {
@@ -20,7 +20,7 @@
     "position": 3,
     "filepath": "src/pages/slides/Slide03Solution.tsx",
     "title": "The Solution",
-    "description": "ناشي — mobile-first Arabic platform connecting scouts with talent through clips, profiles, and a discovery feed.",
+    "description": "Mobile-first Arabic platform connecting youth coaches and clubs with emerging talent across all sports.",
     "speakerNotes": ""
   },
   {
@@ -28,7 +28,7 @@
     "position": 4,
     "filepath": "src/pages/slides/Slide04Features.tsx",
     "title": "Key Features",
-    "description": "Five core features: Home Feed, Upload Clips, Player Profiles, Secure Login, Arabic-First interface.",
+    "description": "Discovery Feed, Upload Clips, Athlete Profiles, All Sports, Arabic-First.",
     "speakerNotes": ""
   },
   {
@@ -36,7 +36,7 @@
     "position": 5,
     "filepath": "src/pages/slides/Slide05AppScreens.tsx",
     "title": "App Screens",
-    "description": "Three core screens: Login, Home Feed, Upload Clips — built with Expo React Native.",
+    "description": "Login, Discovery Feed, and Upload Clips — built with Expo React Native.",
     "speakerNotes": ""
   },
   {
@@ -60,15 +60,15 @@
     "position": 8,
     "filepath": "src/pages/slides/Slide08Roadmap.tsx",
     "title": "Roadmap",
-    "description": "Four phases: Phase 1 complete, Phases 2–4 planned.",
+    "description": "Four phases: Phase 1 complete (all sports, boys and girls), Phases 2–4 planned.",
     "speakerNotes": ""
   },
   {
     "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560009",
     "position": 9,
     "filepath": "src/pages/slides/Slide09Closing.tsx",
-    "title": "Let's Build the Future of Arab Football",
-    "description": "Closing slide with stadium backdrop — ناشي, contact details, call to partner.",
+    "title": "Let's Build the Future of Arab Youth Sports",
+    "description": "Closing slide — every young athlete, every sport, across the Arab world.",
     "speakerNotes": ""
   }
 ]
