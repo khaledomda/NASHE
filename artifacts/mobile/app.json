@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "ناشي",
-    "slug": "mobile",
+    "name": "nashe",
+    "slug": "nashe",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "mobile",
+    "scheme": "nashe",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -17,10 +17,15 @@
       "supportsTablet": false,
       "infoPlist": {
         "NSPhotoLibraryUsageDescription": "ناشي تحتاج إلى الوصول إلى مكتبة الصور لرفع مقاطع اللاعبين."
-      }
+      },
+      "bundleIdentifier": "com.nashe.app"
     },
     "android": {
-      "permissions": ["READ_EXTERNAL_STORAGE", "WRITE_EXTERNAL_STORAGE"]
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "package": "com.nashe.app"
     },
     "web": {
       "favicon": "./assets/images/icon.png"
