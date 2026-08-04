@@ -1,0 +1,74 @@
+[
+  {
+    "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560001",
+    "position": 1,
+    "filepath": "src/pages/slides/Slide01Title.tsx",
+    "title": "ناشي — Nashe",
+    "description": "Title slide — Discovering Arab football talent, one clip at a time.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560002",
+    "position": 2,
+    "filepath": "src/pages/slides/Slide02Problem.tsx",
+    "title": "The Problem",
+    "description": "Four problem cards — hidden talent, costly scouting, no Arabic platform, no digital showcase.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560003",
+    "position": 3,
+    "filepath": "src/pages/slides/Slide03Solution.tsx",
+    "title": "The Solution",
+    "description": "ناشي — mobile-first Arabic platform connecting scouts with talent through clips, profiles, and a discovery feed.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560004",
+    "position": 4,
+    "filepath": "src/pages/slides/Slide04Features.tsx",
+    "title": "Key Features",
+    "description": "Five core features: Home Feed, Upload Clips, Player Profiles, Secure Login, Arabic-First interface.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560005",
+    "position": 5,
+    "filepath": "src/pages/slides/Slide05AppScreens.tsx",
+    "title": "App Screens",
+    "description": "Three core screens: Login, Home Feed, Upload Clips — built with Expo React Native.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560006",
+    "position": 6,
+    "filepath": "src/pages/slides/Slide06HowItWorks.tsx",
+    "title": "How It Works",
+    "description": "Four-step flow: Log In → Film and Upload → Clip Goes Live → Connect.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560007",
+    "position": 7,
+    "filepath": "src/pages/slides/Slide07TechStack.tsx",
+    "title": "Technology Stack",
+    "description": "Expo/React Native, Node.js API, TypeScript, PostgreSQL, pnpm workspace.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560008",
+    "position": 8,
+    "filepath": "src/pages/slides/Slide08Roadmap.tsx",
+    "title": "Roadmap",
+    "description": "Four phases: Phase 1 complete, Phases 2–4 planned.",
+    "speakerNotes": ""
+  },
+  {
+    "id": "f1a2b3c4-d5e6-7890-ab12-cd34ef560009",
+    "position": 9,
+    "filepath": "src/pages/slides/Slide09Closing.tsx",
+    "title": "Let's Build the Future of Arab Football",
+    "description": "Closing slide with stadium backdrop — ناشي, contact details, call to partner.",
+    "speakerNotes": ""
+  }
+]

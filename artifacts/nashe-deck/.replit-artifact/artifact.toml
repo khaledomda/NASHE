@@ -1,0 +1,28 @@
+kind = "slides"
+previewPath = "/nashe-deck/"
+title = "ناشي — Nashe Pitch Deck"
+description = "A presentation slide deck about ناشي (Nashe), an Arabic-language mobile app for football talent discovery across the Arab world. Covers the problem, solution, key features, app screens, technology stack, and roadmap."
+version = "1.0.0"
+id = "artifacts/nashe-deck"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/nashe-deck/" ]
+localPort = 24266
+
+[services.development]
+run = "pnpm --filter @workspace/nashe-deck run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/nashe-deck", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/nashe-deck/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "24266"
+BASE_PATH = "/nashe-deck/"
