@@ -1,0 +1,24 @@
+kind = "mobile"
+previewPath = "/"
+title = "ناشي - Nashe"
+description = "ناشي (Nashe) is an Arabic-language football talent discovery platform. Scouts and coaches can browse featured players, watch the latest clips, discover new talent, and upload video content showcasing players. The app features a green-themed design, RTL Arabic support, and a clean content-first experience."
+version = "1.0.0"
+id = "artifacts/mobile"
+router = "expo-domain"
+
+[[services]]
+name = "expo"
+ensurePreviewReachable = "/status"
+paths = [ "/" ]
+localPort = 18115
+
+[services.development]
+run = "pnpm --filter @workspace/mobile run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/mobile", "run", "build" ]
+run = [ "pnpm", "--filter", "@workspace/mobile", "run", "serve" ]
+
+[services.env]
+PORT = "18115"
+BASE_PATH = "/"
