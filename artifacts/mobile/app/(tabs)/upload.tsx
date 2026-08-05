@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   ActivityIndicator,
   Alert,
@@ -17,45 +17,16 @@ import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
+import { useLanguage } from '@/context/LanguageContext';
+import { useAuth } from '@/context/AuthContext';
+import { SPORTS, sportName, getSport } from '@/constants/sports';
+import { nextVideoCode } from '@/constants/videos';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type PickerOption = { label: string; value: string };
 
-// ─── Data ────────────────────────────────────────────────────────────────────
-
-const ATHLETES: PickerOption[] = [
-  { label: 'سارة العتيبي', value: '1' },
-  { label: 'فيصل الجريني', value: '2' },
-  { label: 'نورة الشمري', value: '3' },
-  { label: 'خالد المطيري', value: '4' },
-  { label: 'ريم الزهراني', value: '5' },
-];
-
-const REGIONS: PickerOption[] = [
-  { label: 'الرياض', value: 'riyadh' },
-  { label: 'جدة', value: 'jeddah' },
-  { label: 'الدمام', value: 'dammam' },
-  { label: 'مكة المكرمة', value: 'makkah' },
-  { label: 'المدينة المنورة', value: 'madinah' },
-  { label: 'الطائف', value: 'taif' },
-];
-
-const SPORTS: PickerOption[] = [
-  { label: 'كرة القدم', value: 'football' },
-  { label: 'كرة السلة', value: 'basketball' },
-  { label: 'السباحة', value: 'swimming' },
-  { label: 'ألعاب القوى', value: 'athletics' },
-  { label: 'التنس', value: 'tennis' },
-  { label: 'كرة الطائرة', value: 'volleyball' },
-  { label: 'الجودو', value: 'judo' },
-  { label: 'الجمباز', value: 'gymnastics' },
-];
-
-const GENDERS: PickerOption[] = [
-  { label: 'ذكر', value: 'male' },
-  { label: 'أنثى', value: 'female' },
-];
+const MAX_VIDEO_SECONDS = 45;
 
 // ─── SelectPicker ─────────────────────────────────────────────────────────────
 
@@ -71,24 +42,19 @@ function SelectPicker({
   onSelect: (value: string) => void;
 }) {
   const colors = useColors();
+  const { row, align } = useLanguage();
   const [open, setOpen] = useState(false);
   const selected = options.find((o) => o.value === value);
 
   return (
     <>
       <Pressable
-        style={[
-          uStyles.pickerBtn,
-          { backgroundColor: colors.input, borderColor: colors.border },
-        ]}
+        style={[uStyles.pickerBtn, { backgroundColor: colors.input, borderColor: colors.border, flexDirection: row }]}
         onPress={() => setOpen(true)}
       >
         <Ionicons name="chevron-down" size={16} color={colors.mutedForeground} />
         <Text
-          style={[
-            uStyles.pickerText,
-            { color: selected ? colors.foreground : colors.mutedForeground },
-          ]}
+          style={[uStyles.pickerText, { color: selected ? colors.foreground : colors.mutedForeground, textAlign: align }]}
         >
           {selected ? selected.label : placeholder}
         </Text>
@@ -105,7 +71,7 @@ function SelectPicker({
                 key={opt.value}
                 style={({ pressed }) => [
                   uStyles.modalOption,
-                  { borderBottomColor: colors.border },
+                  { borderBottomColor: colors.border, flexDirection: row },
                   pressed && { backgroundColor: colors.muted },
                   opt.value === value && { backgroundColor: colors.secondary },
                 ]}
@@ -117,15 +83,13 @@ function SelectPicker({
                 <Text
                   style={[
                     uStyles.modalOptionText,
-                    { color: colors.foreground },
+                    { color: colors.foreground, textAlign: align },
                     opt.value === value && { color: colors.primary, fontFamily: 'Inter_600SemiBold' },
                   ]}
                 >
                   {opt.label}
                 </Text>
-                {opt.value === value && (
-                  <Ionicons name="checkmark" size={18} color={colors.primary} />
-                )}
+                {opt.value === value && <Ionicons name="checkmark" size={18} color={colors.primary} />}
               </Pressable>
             ))}
           </ScrollView>
@@ -140,11 +104,37 @@ function SelectPicker({
 export default function UploadScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
+  const { t, row, align, lang } = useLanguage();
+  const { canUploadThisWeek, recordUpload } = useAuth();
 
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
   const bottomPad = Platform.OS === 'web' ? 34 + 50 : 0;
 
-  const [athlete, setAthlete] = useState('');
+  const REGIONS: PickerOption[] = useMemo(
+    () => [
+      { label: lang === 'ar' ? 'الرياض' : 'Riyadh', value: 'riyadh' },
+      { label: lang === 'ar' ? 'جدة' : 'Jeddah', value: 'jeddah' },
+      { label: lang === 'ar' ? 'الدمام' : 'Dammam', value: 'dammam' },
+      { label: lang === 'ar' ? 'مكة المكرمة' : 'Makkah', value: 'makkah' },
+      { label: lang === 'ar' ? 'المدينة المنورة' : 'Madinah', value: 'madinah' },
+      { label: lang === 'ar' ? 'الطائف' : 'Taif', value: 'taif' },
+    ],
+    [lang]
+  );
+
+  const SPORT_OPTIONS: PickerOption[] = useMemo(
+    () => SPORTS.map((s) => ({ label: sportName(s, lang), value: s.id })),
+    [lang]
+  );
+
+  const GENDERS: PickerOption[] = useMemo(
+    () => [
+      { label: t('male'), value: 'male' },
+      { label: t('female'), value: 'female' },
+    ],
+    [lang]
+  );
+
   const [athleteName, setAthleteName] = useState('');
   const [date, setDate] = useState('');
   const [region, setRegion] = useState('');
@@ -154,6 +144,10 @@ export default function UploadScreen() {
   const [photos, setPhotos] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [videos, setVideos] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [moderationState, setModerationState] = useState<'idle' | 'scanning' | 'flagged' | 'passed'>('idle');
+
+  const canUpload = canUploadThisWeek();
+  const previewCode = sport ? nextVideoCode(getSport(sport as never).code) : null;
 
   const pickPhotos = async () => {
     const result = await ImagePicker.launchImageLibraryAsync({
@@ -172,8 +166,30 @@ export default function UploadScreen() {
       allowsMultipleSelection: true,
       quality: 0.8,
     });
-    if (!result.canceled) {
-      setVideos((prev) => [...prev, ...result.assets]);
+    if (result.canceled) return;
+
+    const accepted: ImagePicker.ImagePickerAsset[] = [];
+    const rejected: string[] = [];
+    for (const asset of result.assets) {
+      // asset.duration is reported in milliseconds on iOS/Android.
+      const seconds = asset.duration ? asset.duration / 1000 : 0;
+      if (seconds > MAX_VIDEO_SECONDS) {
+        rejected.push(asset.fileName ?? asset.uri.split('/').pop() ?? '');
+      } else {
+        accepted.push(asset);
+      }
+    }
+    if (rejected.length > 0) {
+      Alert.alert(t('videoTooLong'), rejected.join(', '));
+    }
+    if (accepted.length > 0) {
+      setVideos((prev) => [...prev, ...accepted]);
+      // Simulated client-side moderation pass — a real check runs server-side
+      // (frame OCR + phone-number pattern match) before the video is queued for admin review.
+      setModerationState('scanning');
+      setTimeout(() => {
+        setModerationState(Math.random() < 0.15 ? 'flagged' : 'passed');
+      }, 900);
     }
   };
 
@@ -183,21 +199,27 @@ export default function UploadScreen() {
 
   const removeVideo = (index: number) => {
     setVideos((prev) => prev.filter((_, i) => i !== index));
+    if (videos.length <= 1) setModerationState('idle');
   };
 
   const handleSubmit = async () => {
-    if (!athlete || !athleteName.trim() || !date.trim() || !region || !sport || !gender) {
-      Alert.alert('خطأ', 'يرجى تعبئة جميع الحقول المطلوبة');
+    if (!canUpload) {
+      Alert.alert(t('uploadLimitTitle'), t('uploadLimitDesc'));
+      return;
+    }
+    if (!athleteName.trim() || !date.trim() || !region || !sport || !gender || videos.length === 0) {
+      Alert.alert(
+        lang === 'ar' ? 'خطأ' : 'Error',
+        lang === 'ar' ? 'يرجى تعبئة جميع الحقول المطلوبة' : 'Please fill in all required fields'
+      );
       return;
     }
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setSubmitting(true);
-    // Simulate upload
-    await new Promise((r) => setTimeout(r, 1500));
+    await new Promise((r) => setTimeout(r, 1200));
+    await recordUpload();
     setSubmitting(false);
-    Alert.alert('تم الرفع', 'تم رفع المقطع بنجاح');
-    // Reset form
-    setAthlete('');
+    Alert.alert(t('uploadSuccess'), t('uploadSuccessDesc'));
     setAthleteName('');
     setDate('');
     setRegion('');
@@ -206,134 +228,123 @@ export default function UploadScreen() {
     setDescription('');
     setPhotos([]);
     setVideos([]);
+    setModerationState('idle');
   };
 
   return (
     <View style={[uStyles.root, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={[uStyles.header, { backgroundColor: colors.primary, paddingTop: topPad + 12 }]}>
+      <View style={[uStyles.header, { backgroundColor: colors.primary, paddingTop: topPad + 12, flexDirection: row }]}>
         <View style={{ width: 24 }} />
-        <Text style={uStyles.headerTitle}>رفع المقاطع</Text>
-        <Ionicons name="chevron-forward" size={22} color="#FFFFFF" />
+        <Text style={uStyles.headerTitle}>{t('uploadTitle')}</Text>
+        <Ionicons name={row === 'row-reverse' ? 'chevron-forward' : 'chevron-back'} size={22} color="#FFFFFF" />
       </View>
+
+      {/* Trial banner */}
+      <View style={[uStyles.trialBanner, { backgroundColor: colors.secondary, flexDirection: row }]}>
+        <Ionicons name="time-outline" size={14} color={colors.primary} />
+        <Text style={[uStyles.trialText, { color: colors.primary, textAlign: align }]}>{t('trialBanner')}</Text>
+      </View>
+
+      {/* Weekly limit notice */}
+      {!canUpload && (
+        <View style={[uStyles.limitBanner, { backgroundColor: colors.destructive + '18', flexDirection: row }]}>
+          <Ionicons name="alert-circle-outline" size={16} color={colors.destructive} />
+          <Text style={[uStyles.limitText, { color: colors.destructive, textAlign: align }]}>
+            {t('uploadLimitDesc')}
+          </Text>
+        </View>
+      )}
 
       <ScrollView
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={[uStyles.scroll, { paddingBottom: bottomPad + 120 }]}
       >
-        {/* Select athlete */}
-        <View style={uStyles.field}>
-          <Text style={[uStyles.label, { color: colors.mutedForeground }]}>اختر رياضياً</Text>
-          <SelectPicker
-            options={ATHLETES}
-            value={athlete}
-            placeholder="اختر رياضياً"
-            onSelect={setAthlete}
-          />
-        </View>
-
         {/* Athlete name */}
         <View style={uStyles.field}>
-          <Text style={[uStyles.label, { color: colors.mutedForeground }]}>اسم الرياضي</Text>
+          <Text style={[uStyles.label, { color: colors.mutedForeground, textAlign: align }]}>{t('athleteName')}</Text>
           <TextInput
-            style={[uStyles.input, { backgroundColor: colors.input, borderColor: colors.border, color: colors.foreground }]}
-            placeholder="اسم الرياضي"
+            style={[uStyles.input, { backgroundColor: colors.input, borderColor: colors.border, color: colors.foreground, textAlign: align }]}
+            placeholder={t('athleteName')}
             placeholderTextColor={colors.mutedForeground}
             value={athleteName}
             onChangeText={setAthleteName}
-            textAlign="right"
           />
         </View>
 
         {/* Date + Region */}
-        <View style={uStyles.row}>
+        <View style={[uStyles.row, { flexDirection: row }]}>
           <View style={[uStyles.field, { flex: 1 }]}>
-            <Text style={[uStyles.label, { color: colors.mutedForeground }]}>تاريخ الميلاد</Text>
+            <Text style={[uStyles.label, { color: colors.mutedForeground, textAlign: align }]}>{t('birthDate')}</Text>
             <TextInput
-              style={[uStyles.input, { backgroundColor: colors.input, borderColor: colors.border, color: colors.foreground }]}
+              style={[uStyles.input, { backgroundColor: colors.input, borderColor: colors.border, color: colors.foreground, textAlign: align }]}
               placeholder="YYYY-MM-DD"
               placeholderTextColor={colors.mutedForeground}
               value={date}
               onChangeText={setDate}
-              textAlign="right"
               keyboardType="numeric"
             />
           </View>
           <View style={[uStyles.field, { flex: 1 }]}>
-            <Text style={[uStyles.label, { color: colors.mutedForeground }]}>المنطقة</Text>
-            <SelectPicker
-              options={REGIONS}
-              value={region}
-              placeholder="المنطقة"
-              onSelect={setRegion}
-            />
+            <Text style={[uStyles.label, { color: colors.mutedForeground, textAlign: align }]}>{t('region')}</Text>
+            <SelectPicker options={REGIONS} value={region} placeholder={t('region')} onSelect={setRegion} />
           </View>
         </View>
 
         {/* Sport + Gender row */}
-        <View style={uStyles.row}>
+        <View style={[uStyles.row, { flexDirection: row }]}>
           <View style={[uStyles.field, { flex: 1 }]}>
-            <Text style={[uStyles.label, { color: colors.mutedForeground }]}>الرياضة</Text>
-            <SelectPicker
-              options={SPORTS}
-              value={sport}
-              placeholder="الرياضة"
-              onSelect={setSport}
-            />
+            <Text style={[uStyles.label, { color: colors.mutedForeground, textAlign: align }]}>{t('sport')}</Text>
+            <SelectPicker options={SPORT_OPTIONS} value={sport} placeholder={t('sport')} onSelect={setSport} />
           </View>
           <View style={[uStyles.field, { flex: 1 }]}>
-            <Text style={[uStyles.label, { color: colors.mutedForeground }]}>الجنس</Text>
-            <SelectPicker
-              options={GENDERS}
-              value={gender}
-              placeholder="الجنس"
-              onSelect={setGender}
-            />
+            <Text style={[uStyles.label, { color: colors.mutedForeground, textAlign: align }]}>{t('gender')}</Text>
+            <SelectPicker options={GENDERS} value={gender} placeholder={t('gender')} onSelect={setGender} />
           </View>
         </View>
 
+        {/* Video code preview */}
+        {previewCode && (
+          <View style={[uStyles.codePreview, { backgroundColor: colors.secondary, flexDirection: row }]}>
+            <Ionicons name="pricetag-outline" size={16} color={colors.primary} />
+            <Text style={[uStyles.codePreviewText, { color: colors.primary, textAlign: align }]}>
+              {t('videoCode')}: {previewCode}
+            </Text>
+          </View>
+        )}
+
         {/* Description */}
         <View style={uStyles.field}>
-          <Text style={[uStyles.label, { color: colors.mutedForeground }]}>نبذة مختصرة</Text>
+          <Text style={[uStyles.label, { color: colors.mutedForeground, textAlign: align }]}>{t('description')}</Text>
           <TextInput
-            style={[
-              uStyles.input,
-              uStyles.textarea,
-              { backgroundColor: colors.input, borderColor: colors.border, color: colors.foreground },
-            ]}
-            placeholder="أكتب نبذة مختصرة عن الرياضي..."
+            style={[uStyles.input, uStyles.textarea, { backgroundColor: colors.input, borderColor: colors.border, color: colors.foreground, textAlign: align }]}
+            placeholder={t('description')}
             placeholderTextColor={colors.mutedForeground}
             value={description}
             onChangeText={setDescription}
             multiline
             numberOfLines={4}
             textAlignVertical="top"
-            textAlign="right"
           />
         </View>
 
         {/* Photos */}
         <View style={uStyles.field}>
-          <View style={[uStyles.mediaHeader, { flexDirection: 'row-reverse' }]}>
-            <Text style={[uStyles.label, { color: colors.mutedForeground, marginBottom: 0 }]}>
-              الصور (اختياري)
-            </Text>
+          <View style={[uStyles.mediaHeader, { flexDirection: row }]}>
+            <Text style={[uStyles.label, { color: colors.mutedForeground, marginBottom: 0 }]}>{t('photos')}</Text>
             <Pressable
-              style={({ pressed }) => [
-                uStyles.addBtn,
-                { backgroundColor: colors.secondary, opacity: pressed ? 0.7 : 1 },
-              ]}
+              style={({ pressed }) => [uStyles.addBtn, { backgroundColor: colors.secondary, opacity: pressed ? 0.7 : 1, flexDirection: row }]}
               onPress={pickPhotos}
             >
               <Ionicons name="add" size={18} color={colors.primary} />
-              <Text style={[uStyles.addBtnText, { color: colors.primary }]}>إضافة</Text>
+              <Text style={[uStyles.addBtnText, { color: colors.primary }]}>{t('add')}</Text>
             </Pressable>
           </View>
           {photos.length === 0 ? (
             <View style={[uStyles.emptyMedia, { borderColor: colors.border, backgroundColor: colors.card }]}>
               <Ionicons name="images-outline" size={28} color={colors.mutedForeground} />
-              <Text style={[uStyles.emptyText, { color: colors.mutedForeground }]}>لا توجد صور</Text>
+              <Text style={[uStyles.emptyText, { color: colors.mutedForeground }]}>{t('noPhotos')}</Text>
             </View>
           ) : (
             <ScrollView horizontal showsHorizontalScrollIndicator={false}>
@@ -353,46 +364,75 @@ export default function UploadScreen() {
 
         {/* Videos */}
         <View style={uStyles.field}>
-          <View style={[uStyles.mediaHeader, { flexDirection: 'row-reverse' }]}>
-            <Text style={[uStyles.label, { color: colors.mutedForeground, marginBottom: 0 }]}>
-              الفيديوهات
-            </Text>
+          <View style={[uStyles.mediaHeader, { flexDirection: row }]}>
+            <Text style={[uStyles.label, { color: colors.mutedForeground, marginBottom: 0 }]}>{t('videos')}</Text>
             <Pressable
-              style={({ pressed }) => [
-                uStyles.addBtn,
-                { backgroundColor: colors.secondary, opacity: pressed ? 0.7 : 1 },
-              ]}
+              style={({ pressed }) => [uStyles.addBtn, { backgroundColor: colors.secondary, opacity: pressed ? 0.7 : 1, flexDirection: row }]}
               onPress={pickVideos}
             >
               <Ionicons name="add" size={18} color={colors.primary} />
-              <Text style={[uStyles.addBtnText, { color: colors.primary }]}>إضافة</Text>
+              <Text style={[uStyles.addBtnText, { color: colors.primary }]}>{t('add')}</Text>
             </Pressable>
           </View>
+          <Text style={[uStyles.hintText, { color: colors.mutedForeground, textAlign: align }]}>{t('videoDurationLabel')}</Text>
+
           {videos.length === 0 ? (
             <View style={[uStyles.emptyMedia, { borderColor: colors.border, backgroundColor: colors.card }]}>
               <Ionicons name="videocam-outline" size={28} color={colors.mutedForeground} />
-              <Text style={[uStyles.emptyText, { color: colors.mutedForeground }]}>لا توجد فيديوهات</Text>
+              <Text style={[uStyles.emptyText, { color: colors.mutedForeground }]}>{t('noVideosField')}</Text>
             </View>
           ) : (
             <View style={uStyles.videoList}>
               {videos.map((video, index) => (
-                <View
-                  key={index}
-                  style={[uStyles.videoItem, { backgroundColor: colors.card, borderColor: colors.border }]}
-                >
+                <View key={index} style={[uStyles.videoItem, { backgroundColor: colors.card, borderColor: colors.border, flexDirection: row }]}>
                   <Pressable onPress={() => removeVideo(index)}>
                     <Ionicons name="close-circle" size={20} color="#EF4444" />
                   </Pressable>
-                  <View style={uStyles.videoMeta}>
+                  <View style={[uStyles.videoMeta, { flexDirection: row }]}>
                     <Ionicons name="videocam" size={20} color={colors.primary} />
-                    <Text style={[uStyles.videoName, { color: colors.foreground }]} numberOfLines={1}>
-                      {video.uri.split('/').pop() ?? `فيديو ${index + 1}`}
+                    <Text style={[uStyles.videoName, { color: colors.foreground, textAlign: align }]} numberOfLines={1}>
+                      {video.fileName ?? video.uri.split('/').pop() ?? `#${index + 1}`}
                     </Text>
                   </View>
                 </View>
               ))}
             </View>
           )}
+
+          {/* Moderation status */}
+          {moderationState !== 'idle' && (
+            <View
+              style={[
+                uStyles.moderationRow,
+                {
+                  flexDirection: row,
+                  backgroundColor:
+                    moderationState === 'flagged' ? colors.destructive + '18' : colors.secondary,
+                },
+              ]}
+            >
+              {moderationState === 'scanning' && <ActivityIndicator size="small" color={colors.primary} />}
+              {moderationState === 'flagged' && <Ionicons name="warning-outline" size={16} color={colors.destructive} />}
+              {moderationState === 'passed' && <Ionicons name="checkmark-circle-outline" size={16} color={colors.primary} />}
+              <Text
+                style={[
+                  uStyles.moderationText,
+                  { color: moderationState === 'flagged' ? colors.destructive : colors.primary, textAlign: align },
+                ]}
+              >
+                {moderationState === 'scanning' && t('moderationScanning')}
+                {moderationState === 'flagged' && t('moderationFlagged')}
+                {moderationState === 'passed' && t('moderationPassed')}
+              </Text>
+            </View>
+          )}
+
+          <View style={[uStyles.moderationNoticeRow, { flexDirection: row }]}>
+            <Ionicons name="information-circle-outline" size={14} color={colors.mutedForeground} />
+            <Text style={[uStyles.moderationNoticeText, { color: colors.mutedForeground, textAlign: align }]}>
+              {t('moderationNotice')}
+            </Text>
+          </View>
         </View>
       </ScrollView>
 
@@ -400,27 +440,23 @@ export default function UploadScreen() {
       <View
         style={[
           uStyles.submitContainer,
-          {
-            backgroundColor: colors.background,
-            borderTopColor: colors.border,
-            paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 8),
-          },
+          { backgroundColor: colors.background, borderTopColor: colors.border, paddingBottom: insets.bottom + (Platform.OS === 'web' ? 34 : 8) },
         ]}
       >
         <Pressable
           style={({ pressed }) => [
             uStyles.submitBtn,
-            { backgroundColor: colors.primary, opacity: pressed ? 0.85 : 1 },
+            { backgroundColor: canUpload ? colors.primary : colors.mutedForeground, opacity: pressed ? 0.85 : 1, flexDirection: row },
           ]}
           onPress={handleSubmit}
-          disabled={submitting}
+          disabled={submitting || !canUpload}
         >
           {submitting ? (
             <ActivityIndicator color="#FFFFFF" />
           ) : (
             <>
               <Ionicons name="cloud-upload-outline" size={20} color="#FFFFFF" />
-              <Text style={uStyles.submitBtnText}>رفع الكل</Text>
+              <Text style={uStyles.submitBtnText}>{t('uploadAll')}</Text>
             </>
           )}
         </Pressable>
@@ -433,187 +469,47 @@ export default function UploadScreen() {
 
 const uStyles = StyleSheet.create({
   root: { flex: 1 },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 20,
-    paddingBottom: 16,
-  },
-  headerTitle: {
-    fontSize: 20,
-    fontWeight: '700' as const,
-    color: '#FFFFFF',
-    fontFamily: 'Inter_700Bold',
-  },
+  header: { alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 16 },
+  headerTitle: { fontSize: 20, fontWeight: '700' as const, color: '#FFFFFF', fontFamily: 'Inter_700Bold' },
+  trialBanner: { alignItems: 'center', gap: 6, paddingHorizontal: 20, paddingVertical: 8 },
+  trialText: { fontSize: 12, fontFamily: 'Inter_500Medium', flex: 1 },
+  limitBanner: { alignItems: 'center', gap: 6, paddingHorizontal: 20, paddingVertical: 10 },
+  limitText: { fontSize: 12, fontFamily: 'Inter_500Medium', flex: 1 },
   scroll: { paddingHorizontal: 16, paddingTop: 20 },
   field: { marginBottom: 16 },
-  label: {
-    fontSize: 13,
-    fontFamily: 'Inter_500Medium',
-    textAlign: 'right',
-    marginBottom: 6,
-  },
-  row: { flexDirection: 'row-reverse', gap: 12 },
-  input: {
-    height: 50,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    fontSize: 15,
-    fontFamily: 'Inter_400Regular',
-  },
-  textarea: {
-    height: 100,
-    paddingTop: 12,
-  },
-  pickerBtn: {
-    height: 50,
-    borderRadius: 12,
-    borderWidth: 1,
-    paddingHorizontal: 14,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-  },
-  pickerText: {
-    fontSize: 15,
-    fontFamily: 'Inter_400Regular',
-    flex: 1,
-    textAlign: 'right',
-  },
-  // Modal
-  modalBackdrop: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.4)',
-  },
-  modalSheet: {
-    borderTopLeftRadius: 20,
-    borderTopRightRadius: 20,
-    maxHeight: '60%',
-    paddingTop: 12,
-  },
-  modalHandle: {
-    width: 36,
-    height: 4,
-    borderRadius: 2,
-    alignSelf: 'center',
-    marginBottom: 12,
-  },
-  modalTitle: {
-    fontSize: 16,
-    fontWeight: '600' as const,
-    fontFamily: 'Inter_600SemiBold',
-    textAlign: 'center',
-    paddingBottom: 12,
-  },
-  modalOption: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    paddingVertical: 14,
-    paddingHorizontal: 20,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-  },
-  modalOptionText: {
-    flex: 1,
-    fontSize: 15,
-    fontFamily: 'Inter_400Regular',
-    textAlign: 'right',
-  },
-  // Media
-  mediaHeader: {
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  addBtn: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 4,
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 8,
-  },
-  addBtnText: {
-    fontSize: 13,
-    fontFamily: 'Inter_500Medium',
-  },
-  emptyMedia: {
-    height: 80,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderStyle: 'dashed',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 6,
-    flexDirection: 'row',
-  },
-  emptyText: {
-    fontSize: 13,
-    fontFamily: 'Inter_400Regular',
-  },
-  mediaGrid: {
-    flexDirection: 'row',
-    gap: 10,
-    paddingVertical: 4,
-  },
-  mediaThumbnail: {
-    width: 80,
-    height: 80,
-    borderRadius: 10,
-    overflow: 'hidden',
-  },
-  thumbnailImage: {
-    width: '100%',
-    height: '100%',
-  },
-  removeBtn: {
-    position: 'absolute',
-    top: 2,
-    right: 2,
-  },
+  label: { fontSize: 13, fontFamily: 'Inter_500Medium', marginBottom: 6 },
+  hintText: { fontSize: 11, fontFamily: 'Inter_400Regular', marginBottom: 8, opacity: 0.8 },
+  row: { gap: 12 },
+  input: { height: 50, borderRadius: 12, borderWidth: 1, paddingHorizontal: 14, fontSize: 15, fontFamily: 'Inter_400Regular' },
+  textarea: { height: 100, paddingTop: 12 },
+  pickerBtn: { height: 50, borderRadius: 12, borderWidth: 1, paddingHorizontal: 14, alignItems: 'center', justifyContent: 'space-between' },
+  pickerText: { fontSize: 15, fontFamily: 'Inter_400Regular', flex: 1 },
+  codePreview: { alignItems: 'center', gap: 8, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 10, marginBottom: 16 },
+  codePreviewText: { fontSize: 13, fontFamily: 'Inter_600SemiBold' },
+  modalBackdrop: { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
+  modalSheet: { borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', paddingTop: 12 },
+  modalHandle: { width: 36, height: 4, borderRadius: 2, alignSelf: 'center', marginBottom: 12 },
+  modalTitle: { fontSize: 16, fontWeight: '600' as const, fontFamily: 'Inter_600SemiBold', textAlign: 'center', paddingBottom: 12 },
+  modalOption: { alignItems: 'center', paddingVertical: 14, paddingHorizontal: 20, borderBottomWidth: StyleSheet.hairlineWidth },
+  modalOptionText: { flex: 1, fontSize: 15, fontFamily: 'Inter_400Regular' },
+  mediaHeader: { alignItems: 'center', justifyContent: 'space-between', marginBottom: 10 },
+  addBtn: { alignItems: 'center', gap: 4, paddingHorizontal: 12, paddingVertical: 6, borderRadius: 8 },
+  addBtnText: { fontSize: 13, fontFamily: 'Inter_500Medium' },
+  emptyMedia: { height: 80, borderRadius: 12, borderWidth: 1, borderStyle: 'dashed', alignItems: 'center', justifyContent: 'center', gap: 6, flexDirection: 'row' },
+  emptyText: { fontSize: 13, fontFamily: 'Inter_400Regular' },
+  mediaGrid: { flexDirection: 'row', gap: 10, paddingVertical: 4 },
+  mediaThumbnail: { width: 80, height: 80, borderRadius: 10, overflow: 'hidden' },
+  thumbnailImage: { width: '100%', height: '100%' },
+  removeBtn: { position: 'absolute', top: 2, right: 2 },
   videoList: { gap: 8 },
-  videoItem: {
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    padding: 12,
-    borderRadius: 12,
-    borderWidth: 1,
-    gap: 10,
-  },
-  videoMeta: {
-    flex: 1,
-    flexDirection: 'row-reverse',
-    alignItems: 'center',
-    gap: 8,
-  },
-  videoName: {
-    flex: 1,
-    fontSize: 13,
-    fontFamily: 'Inter_400Regular',
-    textAlign: 'right',
-  },
-  // Submit
-  submitContainer: {
-    position: 'absolute',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    padding: 16,
-    borderTopWidth: StyleSheet.hairlineWidth,
-  },
-  submitBtn: {
-    height: 52,
-    borderRadius: 14,
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    gap: 8,
-  },
-  submitBtnText: {
-    color: '#FFFFFF',
-    fontSize: 16,
-    fontWeight: '700' as const,
-    fontFamily: 'Inter_700Bold',
-  },
+  videoItem: { alignItems: 'center', padding: 12, borderRadius: 12, borderWidth: 1, gap: 10 },
+  videoMeta: { flex: 1, alignItems: 'center', gap: 8 },
+  videoName: { flex: 1, fontSize: 13, fontFamily: 'Inter_400Regular' },
+  moderationRow: { alignItems: 'center', gap: 8, borderRadius: 10, padding: 10, marginTop: 10 },
+  moderationText: { fontSize: 12, fontFamily: 'Inter_500Medium', flex: 1 },
+  moderationNoticeRow: { alignItems: 'center', gap: 6, marginTop: 10 },
+  moderationNoticeText: { fontSize: 11, fontFamily: 'Inter_400Regular', flex: 1, opacity: 0.8 },
+  submitContainer: { position: 'absolute', bottom: 0, left: 0, right: 0, padding: 16, borderTopWidth: StyleSheet.hairlineWidth },
+  submitBtn: { height: 52, borderRadius: 14, alignItems: 'center', justifyContent: 'center', gap: 8 },
+  submitBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' as const, fontFamily: 'Inter_700Bold' },
 });
