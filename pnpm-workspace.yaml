@@ -47,8 +47,11 @@ catalog:
   '@tailwindcss/vite': ^4.1.14
   '@tanstack/react-query': ^5.90.21
   '@types/node': ^25.3.3
-  '@types/react': ^19.2.0
-  '@types/react-dom': ^19.2.0
+  # Pinned to match the exact 19.1.0 `react`/`react-dom` versions below (required
+  # by Expo) — a mismatched @types major/minor causes duplicate, "unrelated"
+  # type identities for the same interfaces (e.g. React.Ref) across packages.
+  '@types/react': 19.1.17
+  '@types/react-dom': 19.1.11
   '@vitejs/plugin-react': ^5.0.4
   class-variance-authority: ^0.7.1
   clsx: ^2.1.1
