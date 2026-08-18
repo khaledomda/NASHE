@@ -7,27 +7,19 @@ import runtimeErrorOverlay from '@replit/vite-plugin-runtime-error-modal';
 
 import { sdmHmrPlugin } from './src/.sdm/sdmHmrPlugin';
 
+// PORT and BASE_PATH are Replit-specific dev-server conventions. They only
+// matter for the local `server`/`preview` dev servers below — `vite build`
+// itself doesn't use them — so fall back to sane defaults instead of hard
+// failing when running in CI/hosted build environments (e.g. Vercel) that
+// don't set them.
 const rawPort = process.env.PORT;
-
-if (!rawPort) {
-  throw new Error(
-    'PORT environment variable is required but was not provided.',
-  );
-}
-
-const port = Number(rawPort);
+const port = rawPort ? Number(rawPort) : 5000;
 
 if (Number.isNaN(port) || port <= 0) {
   throw new Error(`Invalid PORT value: "${rawPort}"`);
 }
 
-const basePath = process.env.BASE_PATH;
-
-if (!basePath) {
-  throw new Error(
-    'BASE_PATH environment variable is required but was not provided.',
-  );
-}
+const basePath = process.env.BASE_PATH ?? '/';
 
 export default defineConfig({
   base: basePath,
@@ -76,6 +68,11 @@ export default defineConfig({
     },
   },
   preview: {
+    port,
+    host: '0.0.0.0',
+    allowedHosts: true,
+  },
+});
     port,
     host: '0.0.0.0',
     allowedHosts: true,
