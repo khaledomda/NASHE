@@ -14,7 +14,7 @@ type AuthContextType = {
   /** Returns an error message on failure, or null on success. */
   login: (username: string, password: string) => Promise<string | null>;
   /** Returns an error message on failure, or null on success. */
-  register: (input: { username: string; password: string; role: UserRole; phone?: string; email?: string }) => Promise<string | null>;
+  register: (input: { username: string; password: string; role: UserRole; phone?: string; email?: string; inviteCode?: string }) => Promise<string | null>;
   logout: () => Promise<void>;
   canUploadThisWeek: () => boolean;
   recordUpload: () => Promise<void>;
@@ -91,6 +91,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     role: UserRole;
     phone?: string;
     email?: string;
+    inviteCode?: string;
   }): Promise<string | null> => {
     if (!input.username.trim() || input.password.length < 8) {
       return 'Username is required and password must be at least 8 characters.';

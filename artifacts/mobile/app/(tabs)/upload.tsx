@@ -298,10 +298,20 @@ export default function UploadScreen() {
   return (
     <View style={[uStyles.root, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <View style={[uStyles.header, { backgroundColor: colors.primary, paddingTop: topPad + 12, flexDirection: row }]}>
+      <View
+        style={[
+          uStyles.header,
+          {
+            backgroundColor: colors.card,
+            borderBottomColor: colors.border,
+            paddingTop: topPad + 12,
+            flexDirection: row,
+          },
+        ]}
+      >
         <View style={{ width: 24 }} />
-        <Text style={uStyles.headerTitle}>{t('uploadTitle')}</Text>
-        <Ionicons name={row === 'row-reverse' ? 'chevron-forward' : 'chevron-back'} size={22} color="#FFFFFF" />
+        <Text style={[uStyles.headerTitle, { color: colors.foreground }]}>{t('uploadTitle')}</Text>
+        <Ionicons name={row === 'row-reverse' ? 'chevron-forward' : 'chevron-back'} size={22} color={colors.primary} />
       </View>
 
       {/* Trial banner */}
@@ -575,8 +585,14 @@ export default function UploadScreen() {
 
 const uStyles = StyleSheet.create({
   root: { flex: 1 },
-  header: { alignItems: 'center', justifyContent: 'space-between', paddingHorizontal: 20, paddingBottom: 16 },
-  headerTitle: { fontSize: 20, fontWeight: '700' as const, color: '#FFFFFF', fontFamily: 'Inter_700Bold' },
+  header: {
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 20,
+    paddingBottom: 16,
+    borderBottomWidth: StyleSheet.hairlineWidth,
+  },
+  headerTitle: { fontSize: 20, fontWeight: '700' as const, fontFamily: 'Inter_700Bold' },
   trialBanner: { alignItems: 'center', gap: 6, paddingHorizontal: 20, paddingVertical: 8 },
   trialText: { fontSize: 12, fontFamily: 'Inter_500Medium', flex: 1 },
   limitBanner: { alignItems: 'center', gap: 6, paddingHorizontal: 20, paddingVertical: 10 },

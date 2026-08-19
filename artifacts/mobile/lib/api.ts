@@ -1,3 +1,4 @@
+import { Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { setBaseUrl, setAuthTokenGetter, customFetch, ApiError } from '@workspace/api-client-react';
 
@@ -5,12 +6,15 @@ export { ApiError };
 
 const TOKEN_KEY = '@nashe_token_v1';
 
-// Point this at your deployed api-server. Set EXPO_PUBLIC_API_URL in
-// artifacts/mobile/.env (copy from .env.example) — e.g.
-//   EXPO_PUBLIC_API_URL=https://your-api.example.com/api
-// Falls back to localhost for local development against `pnpm dev` in
-// artifacts/api-server.
-const API_BASE = process.env.EXPO_PUBLIC_API_URL ?? 'http://localhost:3000/api';
+// API base URL resolution, in priority order:
+// 1. EXPO_PUBLIC_API_URL (set in artifacts/mobile/.env or the hosting
+//    provider's build env, e.g. Vercel) — must include the /api prefix.
+// 2. On web: same-origin '/api' — works in the Replit preview where the
+//    api-server artifact is path-routed at /api on the same host.
+// 3. Native dev fallback: localhost api-server.
+const API_BASE =
+  process.env.EXPO_PUBLIC_API_URL ??
+  (Platform.OS === 'web' ? '/api' : 'http://localhost:3000/api');
 
 setBaseUrl(API_BASE);
 setAuthTokenGetter(() => AsyncStorage.getItem(TOKEN_KEY));
@@ -62,6 +66,7 @@ export async function apiRegister(input: {
   role: UserRole;
   phone?: string;
   email?: string;
+  inviteCode?: string;
 }) {
   const data = await customFetch<{ token: string; user: PublicUser }>('/auth/register', {
     method: 'POST',

@@ -12,18 +12,27 @@ const registerSchema = z.object({
   role: z.enum(["visitor", "scout", "admin"]).default("visitor"),
   phone: z.string().optional(),
   email: z.string().email().optional(),
+  inviteCode: z.string().optional(),
 });
 
-// NOTE: in production, restrict who can self-register as "admin" (e.g. invite-only,
-// or require an existing admin to promote a user) — this scaffold allows it for
-// simplicity while there's no admin yet to bootstrap the system.
+// Admin accounts are invite-only: self-registering as "admin" requires the
+// ADMIN_INVITE_CODE secret. Without a configured code, admin self-registration
+// is disabled entirely (bootstrap by setting the env var, then registering).
 router.post("/auth/register", async (req, res) => {
   const parsed = registerSchema.safeParse(req.body);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid input", details: parsed.error.flatten() });
     return;
   }
-  const { username, password, role, phone, email } = parsed.data;
+  const { username, password, role, phone, email, inviteCode } = parsed.data;
+
+  if (role === "admin") {
+    const expected = process.env.ADMIN_INVITE_CODE;
+    if (!expected || inviteCode !== expected) {
+      res.status(403).json({ error: "Admin registration requires a valid invite code" });
+      return;
+    }
+  }
 
   const existing = await db.query.usersTable.findFirst({ where: eq(usersTable.username, username) });
   if (existing) {

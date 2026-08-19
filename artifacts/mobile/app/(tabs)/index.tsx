@@ -16,6 +16,7 @@ import { useQuery } from '@tanstack/react-query';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useColors } from '@/hooks/useColors';
 import { useLanguage } from '@/context/LanguageContext';
+import { BrandWordmark } from '@/components/BrandWordmark';
 import { SPORTS, sportName, SportId } from '@/constants/sports';
 import { ACTIVE_USERS_NOW } from '@/constants/videos';
 import { apiListVideos, type FeedVideo } from '@/lib/api';
@@ -159,21 +160,26 @@ export default function HomeScreen() {
   return (
     <View style={[styles.root, { backgroundColor: colors.background }]}>
       {/* Header */}
-      <LinearGradient
-        colors={[colors.gradientStart, colors.gradientEnd]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={[styles.header, { paddingTop: topPad + 12, flexDirection: row }]}
+      <View
+        style={[
+          styles.header,
+          {
+            paddingTop: topPad + 12,
+            flexDirection: row,
+            backgroundColor: colors.card,
+            borderBottomColor: colors.border,
+          },
+        ]}
       >
         <Pressable onPress={() => router.push('/(tabs)/settings')} hitSlop={12}>
-          <Ionicons name="settings-outline" size={24} color="#FFFFFF" />
+          <Ionicons name="settings-outline" size={24} color={colors.primary} />
         </Pressable>
-        <Text style={styles.headerTitle}>{t('tabHome')}</Text>
-        <View style={styles.activeUsersPill}>
-          <Ionicons name="people" size={13} color="#FFFFFF" />
-          <Text style={styles.activeUsersText}>{ACTIVE_USERS_NOW}</Text>
+        <BrandWordmark size={22} />
+        <View style={[styles.activeUsersPill, { backgroundColor: colors.primaryLight }]}>
+          <Ionicons name="people" size={13} color={colors.primary} />
+          <Text style={[styles.activeUsersText, { color: colors.primary }]}>{ACTIVE_USERS_NOW}</Text>
         </View>
-      </LinearGradient>
+      </View>
 
       {/* Trial banner */}
       <View style={[styles.trialBanner, { backgroundColor: colors.secondary, flexDirection: row }]}>
@@ -219,23 +225,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingHorizontal: 20,
     paddingBottom: 16,
-  },
-  headerTitle: {
-    fontSize: 18,
-    fontWeight: '700' as const,
-    color: '#FFFFFF',
-    fontFamily: 'Inter_700Bold',
+    borderBottomWidth: StyleSheet.hairlineWidth,
   },
   activeUsersPill: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 4,
-    backgroundColor: 'rgba(255,255,255,0.2)',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 14,
   },
-  activeUsersText: { color: '#FFFFFF', fontSize: 12, fontFamily: 'Inter_600SemiBold' },
+  activeUsersText: { fontSize: 12, fontFamily: 'Inter_600SemiBold' },
   trialBanner: {
     alignItems: 'center',
     gap: 6,

@@ -1,0 +1,1 @@
+- [NASHE deploy topology](nashe-deploy-topology.md) — static hosts (Vercel) have no /api handler; production web builds require EXPO_PUBLIC_API_URL at build time or auth/feed fail.

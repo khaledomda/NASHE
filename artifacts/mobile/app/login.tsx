@@ -4,19 +4,20 @@ import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
+  ScrollView,
   StyleSheet,
   Text,
   TextInput,
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { useColors } from '@/hooks/useColors';
+import { BrandWordmark } from '@/components/BrandWordmark';
 
 const ROLES: { role: UserRole; icon: keyof typeof Ionicons.glyphMap }[] = [
   { role: 'visitor', icon: 'person-outline' },
@@ -29,7 +30,7 @@ export default function LoginScreen() {
   const insets = useSafeAreaInsets();
   const colors = useColors();
   const { login, register } = useAuth();
-  const { t, row, align, toggleLang } = useLanguage();
+  const { t, row, align, toggleLang, lang } = useLanguage();
 
   const [step, setStep] = useState<'entry' | 'form'>('entry');
   const [mode, setMode] = useState<'login' | 'register'>('login');
@@ -38,6 +39,7 @@ export default function LoginScreen() {
   const [password, setPassword] = useState('');
   const [phone, setPhone] = useState('');
   const [email, setEmail] = useState('');
+  const [inviteCode, setInviteCode] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -72,7 +74,14 @@ export default function LoginScreen() {
     const errorMessage =
       mode === 'login'
         ? await login(username, password)
-        : await register({ username, password, role: selectedRole, phone: phone || undefined, email: email || undefined });
+        : await register({
+            username,
+            password,
+            role: selectedRole,
+            phone: phone || undefined,
+            email: email || undefined,
+            inviteCode: inviteCode.trim() || undefined,
+          });
 
     setLoading(false);
     if (errorMessage === null) {
@@ -83,50 +92,58 @@ export default function LoginScreen() {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      <LinearGradient
-        colors={[colors.gradientStart, colors.gradientEnd]}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-        style={StyleSheet.absoluteFill}
-      />
-      <View style={[styles.container, { paddingTop: insets.top + 48, paddingBottom: insets.bottom + 40 }]}>
+    <KeyboardAvoidingView
+      style={[styles.root, { backgroundColor: colors.background }]}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      {/* Soft lavender wash at the top keeps the page white-first with a light-purple accent */}
+      <View style={[styles.topWash, { backgroundColor: colors.primaryLight }]} />
+      <ScrollView
+        contentContainerStyle={[
+          styles.container,
+          { paddingTop: insets.top + 48, paddingBottom: insets.bottom + 40 },
+        ]}
+        keyboardShouldPersistTaps="handled"
+        showsVerticalScrollIndicator={false}
+      >
         {/* Trial banner */}
-        <View style={styles.trialBanner}>
-          <Ionicons name="time-outline" size={14} color="#FFFFFF" />
-          <Text style={styles.trialText}>{t('trialBanner')}</Text>
+        <View style={[styles.trialBanner, { backgroundColor: colors.secondary }]}>
+          <Ionicons name="time-outline" size={14} color={colors.primary} />
+          <Text style={[styles.trialText, { color: colors.secondaryForeground }]}>{t('trialBanner')}</Text>
         </View>
 
-        {/* Logo */}
-        <View style={styles.logoContainer}>
-          <View style={styles.logoCircle}>
-            <Ionicons name="trophy" size={40} color={colors.primary} />
-          </View>
-        </View>
-
-        <Text style={styles.appName}>{t('appName')}</Text>
-        <Text style={styles.tagline}>{t('tagline')}</Text>
+        {/* Wordmark */}
+        <BrandWordmark size={44} style={{ marginBottom: 8 }} />
+        <Text style={[styles.tagline, { color: colors.mutedForeground }]}>{t('tagline')}</Text>
 
         {step === 'entry' ? (
           <View style={styles.roleList}>
-            <Text style={[styles.chooseTitle, { textAlign: align }]}>{t('chooseEntry')}</Text>
+            <Text style={[styles.chooseTitle, { color: colors.foreground, textAlign: align }]}>{t('chooseEntry')}</Text>
             {ROLES.map((r) => (
               <Pressable
                 key={r.role}
-                style={({ pressed }) => [styles.roleCard, { flexDirection: row, opacity: pressed ? 0.85 : 1 }]}
+                style={({ pressed }) => [
+                  styles.roleCard,
+                  {
+                    flexDirection: row,
+                    backgroundColor: colors.card,
+                    borderColor: colors.border,
+                    opacity: pressed ? 0.85 : 1,
+                  },
+                ]}
                 onPress={() => chooseRole(r.role)}
               >
                 <View style={[styles.roleIconWrap, { backgroundColor: roleColor(r.role) }]}>
                   <Ionicons name={r.icon} size={22} color="#FFFFFF" />
                 </View>
                 <View style={styles.roleTextWrap}>
-                  <Text style={[styles.roleTitle, { textAlign: align }]}>{roleTitle(r.role)}</Text>
-                  <Text style={[styles.roleDesc, { textAlign: align }]}>{roleDesc(r.role)}</Text>
+                  <Text style={[styles.roleTitle, { color: colors.foreground, textAlign: align }]}>{roleTitle(r.role)}</Text>
+                  <Text style={[styles.roleDesc, { color: colors.mutedForeground, textAlign: align }]}>{roleDesc(r.role)}</Text>
                 </View>
                 <Ionicons
                   name={row === 'row-reverse' ? 'chevron-back' : 'chevron-forward'}
                   size={18}
-                  color="rgba(255,255,255,0.6)"
+                  color={colors.mutedForeground}
                 />
               </Pressable>
             ))}
@@ -140,15 +157,26 @@ export default function LoginScreen() {
                 resetFormFields();
               }}
             >
-              <Ionicons name={row === 'row-reverse' ? 'chevron-forward' : 'chevron-back'} size={16} color="rgba(255,255,255,0.8)" />
-              <Text style={styles.backText}>{selectedRole ? roleTitle(selectedRole) : ''}</Text>
+              <Ionicons
+                name={row === 'row-reverse' ? 'chevron-forward' : 'chevron-back'}
+                size={16}
+                color={colors.primary}
+              />
+              <Text style={[styles.backText, { color: colors.primary }]}>
+                {selectedRole ? roleTitle(selectedRole) : ''}
+              </Text>
             </Pressable>
 
-            <View style={[styles.inputWrapper, { flexDirection: row }]}>
+            <View
+              style={[
+                styles.inputWrapper,
+                { flexDirection: row, backgroundColor: colors.input, borderColor: colors.border },
+              ]}
+            >
               <TextInput
-                style={[styles.input, { textAlign: align }]}
+                style={[styles.input, { color: colors.foreground, textAlign: align }]}
                 placeholder={t('username')}
-                placeholderTextColor="rgba(11,18,32,0.4)"
+                placeholderTextColor={colors.mutedForeground}
                 value={username}
                 onChangeText={setUsername}
                 autoCapitalize="none"
@@ -156,11 +184,16 @@ export default function LoginScreen() {
               <Ionicons name="person-outline" size={20} color={colors.primary} />
             </View>
 
-            <View style={[styles.inputWrapper, { flexDirection: row }]}>
+            <View
+              style={[
+                styles.inputWrapper,
+                { flexDirection: row, backgroundColor: colors.input, borderColor: colors.border },
+              ]}
+            >
               <TextInput
-                style={[styles.input, { textAlign: align }]}
+                style={[styles.input, { color: colors.foreground, textAlign: align }]}
                 placeholder={t('password')}
-                placeholderTextColor="rgba(11,18,32,0.4)"
+                placeholderTextColor={colors.mutedForeground}
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
@@ -172,22 +205,32 @@ export default function LoginScreen() {
 
             {mode === 'register' && (
               <>
-                <View style={[styles.inputWrapper, { flexDirection: row }]}>
+                <View
+                  style={[
+                    styles.inputWrapper,
+                    { flexDirection: row, backgroundColor: colors.input, borderColor: colors.border },
+                  ]}
+                >
                   <TextInput
-                    style={[styles.input, { textAlign: align }]}
+                    style={[styles.input, { color: colors.foreground, textAlign: align }]}
                     placeholder={t('phoneOptional')}
-                    placeholderTextColor="rgba(11,18,32,0.4)"
+                    placeholderTextColor={colors.mutedForeground}
                     value={phone}
                     onChangeText={setPhone}
                     keyboardType="phone-pad"
                   />
                   <Ionicons name="call-outline" size={20} color={colors.primary} />
                 </View>
-                <View style={[styles.inputWrapper, { flexDirection: row }]}>
+                <View
+                  style={[
+                    styles.inputWrapper,
+                    { flexDirection: row, backgroundColor: colors.input, borderColor: colors.border },
+                  ]}
+                >
                   <TextInput
-                    style={[styles.input, { textAlign: align }]}
+                    style={[styles.input, { color: colors.foreground, textAlign: align }]}
                     placeholder={t('emailOptional')}
-                    placeholderTextColor="rgba(11,18,32,0.4)"
+                    placeholderTextColor={colors.mutedForeground}
                     value={email}
                     onChangeText={setEmail}
                     autoCapitalize="none"
@@ -195,21 +238,43 @@ export default function LoginScreen() {
                   />
                   <Ionicons name="mail-outline" size={20} color={colors.primary} />
                 </View>
-                <Text style={styles.hintText}>{t('passwordHint')}</Text>
+                {selectedRole === 'admin' && (
+                  <View
+                    style={[
+                      styles.inputWrapper,
+                      { flexDirection: row, backgroundColor: colors.input, borderColor: colors.border },
+                    ]}
+                  >
+                    <TextInput
+                      style={[styles.input, { color: colors.foreground, textAlign: align }]}
+                      placeholder={lang === 'ar' ? 'رمز دعوة المشرف' : 'Admin invite code'}
+                      placeholderTextColor={colors.mutedForeground}
+                      value={inviteCode}
+                      onChangeText={setInviteCode}
+                      autoCapitalize="none"
+                    />
+                    <Ionicons name="key-outline" size={20} color={colors.primary} />
+                  </View>
+                )}
+                <Text style={[styles.hintText, { color: colors.mutedForeground }]}>{t('passwordHint')}</Text>
               </>
             )}
 
-            {!!error && <Text style={styles.errorText}>{error}</Text>}
+            {!!error && <Text style={[styles.errorText, { color: colors.destructive }]}>{error}</Text>}
 
             <Pressable
-              style={({ pressed }) => [styles.submitBtn, pressed && styles.submitBtnPressed]}
+              style={({ pressed }) => [
+                styles.submitBtn,
+                { backgroundColor: colors.primary },
+                pressed && styles.submitBtnPressed,
+              ]}
               onPress={handleSubmit}
               disabled={loading}
             >
               {loading ? (
-                <ActivityIndicator color={colors.primary} />
+                <ActivityIndicator color={colors.primaryForeground} />
               ) : (
-                <Text style={[styles.submitBtnText, { color: colors.primary }]}>
+                <Text style={[styles.submitBtnText, { color: colors.primaryForeground }]}>
                   {mode === 'login' ? t('login') : t('registerButton')}
                 </Text>
               )}
@@ -222,58 +287,45 @@ export default function LoginScreen() {
               }}
               style={styles.switchModeBtn}
             >
-              <Text style={styles.switchModeText}>{mode === 'login' ? t('needAccount') : t('haveAccount')}</Text>
+              <Text style={[styles.switchModeText, { color: colors.primary }]}>
+                {mode === 'login' ? t('needAccount') : t('haveAccount')}
+              </Text>
             </Pressable>
           </View>
         )}
 
         <Pressable style={styles.langToggle} onPress={toggleLang}>
-          <Text style={styles.langText}>{t('language')}</Text>
+          <Text style={[styles.langText, { color: colors.mutedForeground }]}>{t('language')}</Text>
         </Pressable>
-      </View>
+      </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
   root: { flex: 1 },
-  container: { flex: 1, alignItems: 'center', paddingHorizontal: 24 },
+  topWash: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    height: 220,
+    borderBottomLeftRadius: 48,
+    borderBottomRightRadius: 48,
+  },
+  container: { flexGrow: 1, alignItems: 'center', paddingHorizontal: 24 },
   trialBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: 6,
-    backgroundColor: 'rgba(255,255,255,0.18)',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,
-    marginBottom: 16,
+    marginBottom: 20,
   },
-  trialText: { color: '#FFFFFF', fontSize: 12, fontFamily: 'Inter_500Medium' },
-  logoContainer: { marginBottom: 16 },
-  logoCircle: {
-    width: 76,
-    height: 76,
-    borderRadius: 38,
-    backgroundColor: '#FFFFFF',
-    alignItems: 'center',
-    justifyContent: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 6,
-  },
-  appName: {
-    fontSize: 36,
-    fontWeight: '800' as const,
-    color: '#FFFFFF',
-    letterSpacing: 1,
-    marginBottom: 6,
-    fontFamily: 'Inter_700Bold',
-  },
+  trialText: { fontSize: 12, fontFamily: 'Inter_500Medium' },
   tagline: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.85)',
     marginBottom: 28,
     textAlign: 'center',
     paddingHorizontal: 12,
@@ -282,16 +334,20 @@ const styles = StyleSheet.create({
   roleList: { width: '100%', gap: 12 },
   chooseTitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.9)',
     fontFamily: 'Inter_600SemiBold',
     marginBottom: 4,
   },
   roleCard: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.14)',
     borderRadius: 18,
+    borderWidth: 1,
     padding: 14,
     gap: 12,
+    shadowColor: '#5B4BD5',
+    shadowOpacity: 0.06,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 2,
   },
   roleIconWrap: {
     width: 44,
@@ -301,24 +357,23 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   roleTextWrap: { flex: 1 },
-  roleTitle: { color: '#FFFFFF', fontSize: 15, fontFamily: 'Inter_600SemiBold' },
-  roleDesc: { color: 'rgba(255,255,255,0.72)', fontSize: 12, fontFamily: 'Inter_400Regular', marginTop: 2 },
+  roleTitle: { fontSize: 15, fontFamily: 'Inter_600SemiBold' },
+  roleDesc: { fontSize: 12, fontFamily: 'Inter_400Regular', marginTop: 2 },
   form: { width: '100%', gap: 14 },
   backRow: { alignItems: 'center', gap: 6, marginBottom: 4 },
-  backText: { color: 'rgba(255,255,255,0.85)', fontSize: 14, fontFamily: 'Inter_600SemiBold' },
+  backText: { fontSize: 14, fontFamily: 'Inter_600SemiBold' },
   inputWrapper: {
     alignItems: 'center',
-    backgroundColor: '#FFFFFF',
     borderRadius: 14,
+    borderWidth: 1,
     paddingHorizontal: 16,
     height: 52,
     gap: 10,
   },
-  input: { flex: 1, fontSize: 15, color: '#0B1220', fontFamily: 'Inter_400Regular' },
-  hintText: { color: 'rgba(255,255,255,0.65)', fontSize: 11, fontFamily: 'Inter_400Regular', marginTop: -6 },
-  errorText: { color: '#FFD1D6', fontSize: 13, textAlign: 'center', fontFamily: 'Inter_400Regular' },
+  input: { flex: 1, fontSize: 15, fontFamily: 'Inter_400Regular' },
+  hintText: { fontSize: 11, fontFamily: 'Inter_400Regular', marginTop: -6 },
+  errorText: { fontSize: 13, textAlign: 'center', fontFamily: 'Inter_400Regular' },
   submitBtn: {
-    backgroundColor: '#FFFFFF',
     borderRadius: 14,
     height: 52,
     alignItems: 'center',
@@ -328,7 +383,7 @@ const styles = StyleSheet.create({
   submitBtnPressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
   submitBtnText: { fontSize: 16, fontWeight: '700' as const, fontFamily: 'Inter_700Bold' },
   switchModeBtn: { alignItems: 'center', paddingVertical: 4 },
-  switchModeText: { color: 'rgba(255,255,255,0.85)', fontSize: 13, fontFamily: 'Inter_500Medium' },
+  switchModeText: { fontSize: 13, fontFamily: 'Inter_500Medium' },
   langToggle: { marginTop: 'auto', paddingVertical: 12 },
-  langText: { color: 'rgba(255,255,255,0.65)', fontSize: 13, fontFamily: 'Inter_400Regular' },
+  langText: { fontSize: 13, fontFamily: 'Inter_400Regular' },
 });
