@@ -25,7 +25,7 @@ export const SPORTS: Sport[] = [
   { id: 'basketball', code: 'B', nameAr: 'كرة السلة', nameEn: 'Basketball', icon: 'basketball-outline', iconSet: 'ion' },
   { id: 'volleyball', code: 'V', nameAr: 'الكرة الطائرة', nameEn: 'Volleyball', icon: 'volleyball', iconSet: 'mci' },
   { id: 'athletics', code: 'A', nameAr: 'ألعاب القوى', nameEn: 'Athletics', icon: 'run', iconSet: 'mci' },
-  { id: 'swimming', code: 'S', nameAr: 'السباحة', nameEn: 'Swimming', icon: 'swim-outline', iconSet: 'ion' },
+  { id: 'swimming', code: 'S', nameAr: 'السباحة', nameEn: 'Swimming', icon: 'water-outline', iconSet: 'ion' },
   { id: 'padel', code: 'P', nameAr: 'البادل', nameEn: 'Padel', icon: 'tennisball-outline', iconSet: 'ion' },
   { id: 'handball', code: 'H', nameAr: 'كرة اليد', nameEn: 'Handball', icon: 'handball', iconSet: 'mci' },
   { id: 'judo', code: 'J', nameAr: 'الجودو', nameEn: 'Judo', icon: 'karate', iconSet: 'mci' },
