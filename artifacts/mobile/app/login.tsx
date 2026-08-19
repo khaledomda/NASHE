@@ -294,6 +294,18 @@ export default function LoginScreen() {
           </View>
         )}
 
+        <View style={[styles.ownershipNotice, { backgroundColor: colors.primaryLight, borderColor: colors.border }]}>
+          <Ionicons name="shield-checkmark-outline" size={18} color={colors.primary} />
+          <Text style={[styles.ownershipNoticeText, { color: colors.mutedForeground }]}>
+            {lang === 'ar'
+              ? 'فكرة وتطبيق ناشئ مملوكان للدكتور خالد عبد الكريم العمدة'
+              : 'The NASHE idea and app are owned by Dr. Khalid Abdelkarim Al-Omda'}
+          </Text>
+          <Text style={[styles.ownershipCopyright, { color: colors.primary }]}>
+            {lang === 'ar' ? '© 2026 — جميع الحقوق محفوظة' : '© 2026 — All rights reserved'}
+          </Text>
+        </View>
+
         <Pressable style={styles.langToggle} onPress={toggleLang}>
           <Text style={[styles.langText, { color: colors.mutedForeground }]}>{t('language')}</Text>
         </Pressable>
@@ -384,6 +396,18 @@ const styles = StyleSheet.create({
   submitBtnText: { fontSize: 16, fontWeight: '700' as const, fontFamily: 'Inter_700Bold' },
   switchModeBtn: { alignItems: 'center', paddingVertical: 4 },
   switchModeText: { fontSize: 13, fontFamily: 'Inter_500Medium' },
+  ownershipNotice: {
+    width: '100%',
+    alignItems: 'center',
+    gap: 5,
+    marginTop: 22,
+    paddingHorizontal: 14,
+    paddingVertical: 12,
+    borderRadius: 14,
+    borderWidth: 1,
+  },
+  ownershipNoticeText: { fontSize: 11, lineHeight: 16, textAlign: 'center', fontFamily: 'Inter_500Medium' },
+  ownershipCopyright: { fontSize: 10, fontFamily: 'Inter_600SemiBold' },
   langToggle: { marginTop: 'auto', paddingVertical: 12 },
   langText: { fontSize: 13, fontFamily: 'Inter_400Regular' },
 });

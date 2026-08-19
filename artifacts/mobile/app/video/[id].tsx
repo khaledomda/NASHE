@@ -118,10 +118,16 @@ export default function VideoDetailScreen() {
       {/* Bottom info + like bar */}
       <View style={[styles.bottomBar, { flexDirection: row }]}>
         <View style={styles.infoCol}>
-          <Text style={[styles.athleteName, { textAlign: align }]}>{data!.athleteName}</Text>
-          <Text style={[styles.metaLine, { textAlign: align }]}>
-            {sportName(sport, lang)} · {data!.athleteRegion}
-          </Text>
+           {data?.athleteName ? (
+             <>
+               <Text style={[styles.athleteName, { textAlign: align }]}>{data.athleteName}</Text>
+               <Text style={[styles.metaLine, { textAlign: align }]}>
+                 {sportName(sport, lang)} · {data.athleteRegion}
+               </Text>
+             </>
+           ) : (
+             <Text style={[styles.athleteName, { textAlign: align }]}>{video.code}</Text>
+           )}
           <View style={[styles.viewsRow, { flexDirection: row }]}>
             <Ionicons name="eye-outline" size={14} color="rgba(255,255,255,0.85)" />
             <Text style={styles.viewsText}>

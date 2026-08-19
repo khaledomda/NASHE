@@ -56,7 +56,7 @@ export type ApiVideo = {
   uploadedAt: string;
 };
 
-export type FeedVideo = ApiVideo & { athleteName: string; athleteRegion: string };
+export type FeedVideo = ApiVideo & { athleteName?: string; athleteRegion?: string };
 
 // ─── Auth ────────────────────────────────────────────────────────────────────
 
@@ -100,7 +100,7 @@ export async function apiListVideos(params?: { sport?: string; gender?: 'male' |
 }
 
 export async function apiGetVideo(id: string) {
-  return customFetch<{ video: ApiVideo; athleteName: string; athleteRegion: string; likedByMe: boolean }>(
+  return customFetch<{ video: ApiVideo; athleteName?: string; athleteRegion?: string; likedByMe: boolean }>(
     `/videos/${id}`
   );
 }

@@ -158,6 +158,29 @@ export default function SettingsScreen() {
         </Pressable>
       </View>
 
+      {/* Intellectual property ownership */}
+      <View
+        style={[
+          sStyles.ownershipCard,
+          { backgroundColor: colors.primaryLight, borderColor: colors.border },
+        ]}
+      >
+        <Ionicons name="shield-checkmark-outline" size={22} color={colors.primary} />
+        <View style={sStyles.ownershipContent}>
+          <Text style={[sStyles.ownershipTitle, { color: colors.foreground, textAlign: align }]}>
+            {lang === 'ar' ? 'ملكية الفكرة والتطبيق' : 'Intellectual Property'}
+          </Text>
+          <Text style={[sStyles.ownershipText, { color: colors.mutedForeground, textAlign: align }]}>
+            {lang === 'ar'
+              ? 'فكرة وتطبيق ناشئ مملوكان للدكتور خالد عبد الكريم العمدة.'
+              : 'The NASHE idea and app are owned by Dr. Khalid Abdelkarim Al-Omda.'}
+          </Text>
+          <Text style={[sStyles.ownershipCopyright, { color: colors.primary, textAlign: align }]}>
+            {lang === 'ar' ? '© 2026 د. خالد عبد الكريم العمدة — جميع الحقوق محفوظة' : '© 2026 Dr. Khalid Abdelkarim Al-Omda — All rights reserved'}
+          </Text>
+        </View>
+      </View>
+
       {/* Logout */}
       <Pressable
         style={({ pressed }) => [
@@ -213,6 +236,20 @@ const sStyles = StyleSheet.create({
     borderWidth: 1,
     gap: 10,
   },
+  ownershipCard: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    marginHorizontal: 16,
+    marginBottom: 2,
+    padding: 14,
+    borderRadius: 16,
+    borderWidth: 1,
+  },
+  ownershipContent: { flex: 1, gap: 4 },
+  ownershipTitle: { fontSize: 14, fontFamily: 'Inter_700Bold' },
+  ownershipText: { fontSize: 12, lineHeight: 18, fontFamily: 'Inter_400Regular' },
+  ownershipCopyright: { fontSize: 11, lineHeight: 16, fontFamily: 'Inter_600SemiBold' },
   logoutText: { fontSize: 15, fontWeight: '600' as const, fontFamily: 'Inter_600SemiBold' },
   versionRow: { alignItems: 'center', marginTop: 20 },
   versionText: { fontSize: 12, fontFamily: 'Inter_400Regular' },

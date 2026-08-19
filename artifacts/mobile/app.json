@@ -1,11 +1,11 @@
 {
   "expo": {
-    "name": "nashe",
-    "slug": "nashe",
+    "name": "nashe redesigned",
+    "slug": "nasheredesigned",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
-    "scheme": "nashe",
+    "scheme": "nasheredesigned",
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "splash": {
@@ -16,16 +16,16 @@
     "ios": {
       "supportsTablet": false,
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "ناشي تحتاج إلى الوصول إلى مكتبة الصور لرفع مقاطع اللاعبين."
+        "NSPhotoLibraryUsageDescription": "ناشئ تحتاج إلى الوصول إلى مكتبة الصور لرفع مقاطع اللاعبين."
       },
-      "bundleIdentifier": "com.nashe.app"
+      "bundleIdentifier": "com.nasheredesigned.app"
     },
     "android": {
       "permissions": [
         "READ_EXTERNAL_STORAGE",
         "WRITE_EXTERNAL_STORAGE"
       ],
-      "package": "com.nashe.app"
+      "package": "com.nasheredesigned.app"
     },
     "web": {
       "favicon": "./assets/images/icon.png",

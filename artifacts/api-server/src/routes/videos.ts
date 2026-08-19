@@ -18,6 +18,7 @@ import { createPresignedVideoUpload, ALLOWED_VIDEO_CONTENT_TYPES } from "../lib/
 const router: IRouter = Router();
 
 const WEEK_MS = 7 * 24 * 60 * 60 * 1000;
+const CLUB_MAX_VIDEO_SECONDS = 180;
 
 function routeParam(value: string | string[]): string {
   return Array.isArray(value) ? value[0] : value;
@@ -29,7 +30,7 @@ const listQuerySchema = z.object({
   gender: z.enum(["male", "female"]).optional(),
 });
 
-router.get("/videos", async (req, res) => {
+router.get("/videos", optionalAuth, async (req, res) => {
   const parsed = listQuerySchema.safeParse(req.query);
   if (!parsed.success) {
     res.status(400).json({ error: "Invalid query" });
@@ -53,11 +54,11 @@ router.get("/videos", async (req, res) => {
     .orderBy(desc(videosTable.uploadedAt))
     .limit(100);
 
+  const canSeePrivateInfo = req.user?.role === "admin" || req.user?.role === "scout";
   res.json({
     videos: rows.map(({ video, athleteName, athleteRegion }) => ({
       ...video,
-      athleteName,
-      athleteRegion,
+      ...(canSeePrivateInfo ? { athleteName, athleteRegion } : {}),
     })),
   });
 });
@@ -95,8 +96,9 @@ router.get("/videos/:id", optionalAuth, async (req, res) => {
 
   res.json({
     video: row.video,
-    athleteName: row.athleteName,
-    athleteRegion: row.athleteRegion,
+    ...(req.user?.role === "admin" || req.user?.role === "scout"
+      ? { athleteName: row.athleteName, athleteRegion: row.athleteRegion }
+      : {}),
     likedByMe,
   });
 });
@@ -236,8 +238,9 @@ router.post("/videos", requireAuth, async (req, res) => {
 
   // Re-check the 45s cap server-side — the client already blocks longer clips,
   // but the client can't be trusted as the source of truth.
-  if (durationSec > MAX_VIDEO_SECONDS) {
-    res.status(422).json({ error: `Video must not exceed ${MAX_VIDEO_SECONDS} seconds` });
+  const maxVideoSeconds = req.user?.role === "scout" ? CLUB_MAX_VIDEO_SECONDS : MAX_VIDEO_SECONDS;
+  if (durationSec > maxVideoSeconds) {
+    res.status(422).json({ error: `Video must not exceed ${maxVideoSeconds} seconds for this account` });
     return;
   }
 

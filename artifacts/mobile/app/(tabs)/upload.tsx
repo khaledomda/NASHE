@@ -28,7 +28,8 @@ import { apiGetUploadUrl, apiUploadVideoFile, apiSubmitVideo, ApiError } from '@
 
 type PickerOption = { label: string; value: string };
 
-const MAX_VIDEO_SECONDS = 45;
+const STANDARD_MAX_VIDEO_SECONDS = 45;
+const CLUB_MAX_VIDEO_SECONDS = 180;
 
 function guessVideoContentType(asset: ImagePicker.ImagePickerAsset): string {
   if (asset.mimeType) return asset.mimeType;
@@ -115,7 +116,7 @@ export default function UploadScreen() {
   const colors = useColors();
   const insets = useSafeAreaInsets();
   const { t, row, align, lang } = useLanguage();
-  const { canUploadThisWeek, recordUpload } = useAuth();
+  const { canUploadThisWeek, recordUpload, role } = useAuth();
   const queryClient = useQueryClient();
 
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
@@ -161,6 +162,7 @@ export default function UploadScreen() {
   const [moderationState, setModerationState] = useState<'idle' | 'scanning' | 'flagged' | 'passed'>('idle');
 
   const canUpload = canUploadThisWeek();
+  const maxVideoSeconds = role === 'scout' ? CLUB_MAX_VIDEO_SECONDS : STANDARD_MAX_VIDEO_SECONDS;
   const previewCode = sport ? nextVideoCode(getSport(sport as never).code) : null;
 
   const pickPhotos = async () => {
@@ -187,7 +189,7 @@ export default function UploadScreen() {
     for (const asset of result.assets) {
       // asset.duration is reported in milliseconds on iOS/Android.
       const seconds = asset.duration ? asset.duration / 1000 : 0;
-      if (seconds > MAX_VIDEO_SECONDS) {
+      if (seconds > maxVideoSeconds) {
         rejected.push(asset.fileName ?? asset.uri.split('/').pop() ?? '');
       } else {
         accepted.push(asset);
@@ -485,7 +487,9 @@ export default function UploadScreen() {
               <Text style={[uStyles.addBtnText, { color: colors.primary }]}>{t('add')}</Text>
             </Pressable>
           </View>
-          <Text style={[uStyles.hintText, { color: colors.mutedForeground, textAlign: align }]}>{t('videoDurationLabel')}</Text>
+          <Text style={[uStyles.hintText, { color: colors.mutedForeground, textAlign: align }]}>
+            {role === 'scout' ? t('clubVideoDurationLabel') : t('videoDurationLabel')}
+          </Text>
 
           {videos.length === 0 ? (
             <View style={[uStyles.emptyMedia, { borderColor: colors.border, backgroundColor: colors.card }]}>
