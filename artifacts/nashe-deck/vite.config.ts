@@ -36,9 +36,6 @@ export default defineConfig({
               root: path.resolve(import.meta.dirname, '..'),
             }),
           ),
-          await import('@replit/vite-plugin-dev-banner').then((m) =>
-            m.devBanner(),
-          ),
         ]
       : []),
   ],
@@ -68,11 +65,6 @@ export default defineConfig({
     },
   },
   preview: {
-    port,
-    host: '0.0.0.0',
-    allowedHosts: true,
-  },
-});
     port,
     host: '0.0.0.0',
     allowedHosts: true,

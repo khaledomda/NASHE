@@ -2,9 +2,11 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import type { UserRole } from "@workspace/db";
 
-const secretFromEnv = process.env.JWT_SECRET;
+const secretFromEnv = process.env.JWT_SECRET ?? process.env.SESSION_SECRET;
 if (!secretFromEnv) {
-  throw new Error("JWT_SECRET must be set. Generate one with: openssl rand -hex 32");
+  throw new Error(
+    "JWT_SECRET or SESSION_SECRET must be set. Generate one with: openssl rand -hex 32",
+  );
 }
 const JWT_SECRET: string = secretFromEnv;
 

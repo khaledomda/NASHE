@@ -61,9 +61,3 @@ export default defineConfig({
     allowedHosts: true,
   },
 });
-  preview: {
-    port,
-    host: "0.0.0.0",
-    allowedHosts: true,
-  },
-});

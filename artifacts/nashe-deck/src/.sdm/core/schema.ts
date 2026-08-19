@@ -492,7 +492,17 @@ export const SlideDocumentSchema = Type.Object(
   strict,
 );
 
-export type JsonValue = Static<typeof JsonValueSchema>;
+// TypeBox's recursive schema is useful at runtime, but deriving its static
+// type under TypeScript 5.9 can exceed the compiler's recursion limit.
+// Keep the public type explicitly recursive while Value.Check continues to
+// validate the same schema at runtime.
+export type JsonValue =
+  | null
+  | boolean
+  | number
+  | string
+  | Array<JsonValue>
+  | { [key: string]: JsonValue };
 export type Size = Static<typeof SizeSchema>;
 export type Frame = Static<typeof FrameSchema>;
 export type Insets = Static<typeof InsetsSchema>;
@@ -506,10 +516,105 @@ export type TextRun = Static<typeof TextRunSchema>;
 export type Paragraph = Static<typeof ParagraphSchema>;
 export type TextBody = Static<typeof TextBodySchema>;
 export type Geometry = Static<typeof GeometrySchema>;
-export type Element = Static<typeof ElementSchema>;
 export type Asset = Static<typeof AssetSchema>;
 export type Theme = Static<typeof ThemeSchema>;
-export type SlideDocument = Static<typeof SlideDocumentSchema>;
+
+type ElementBase = {
+  id: string;
+  name?: string;
+  frame: Frame;
+  rotationDeg?: number;
+  flipH?: boolean;
+  flipV?: boolean;
+  opacity?: number;
+  hidden?: boolean;
+  locked?: boolean;
+  altText?: string;
+  action?: Action;
+};
+
+type TextElement = ElementBase & {
+  type: 'text';
+  body: TextBody;
+  fill?: Paint;
+  stroke?: Stroke;
+};
+
+type ShapeElement = ElementBase & {
+  type: 'shape';
+  geometry: Geometry;
+  fill: Paint;
+  stroke?: Stroke;
+  body?: TextBody;
+};
+
+type ImageElement = ElementBase & {
+  type: 'image';
+  assetId: string;
+  fit: 'cover' | 'contain' | 'fill';
+  crop?: Insets;
+};
+
+type LineElement = ElementBase & {
+  type: 'line';
+  points: Array<Point>;
+  stroke: Stroke;
+};
+
+type GroupElement = ElementBase & {
+  type: 'group';
+  coordinateSpace: Size;
+  children: Array<Element>;
+  clip?: boolean;
+};
+
+type TableCell = {
+  body: TextBody;
+  fill?: Paint;
+  colSpan?: number;
+  rowSpan?: number;
+};
+
+type TableElement = ElementBase & {
+  type: 'table';
+  columns: Array<{ width: number }>;
+  rows: Array<{ height?: number; cells: Array<TableCell> }>;
+};
+
+type WidgetElement = ElementBase & {
+  type: 'widget';
+  widget: {
+    module: string;
+    exportName?: string;
+    props?: Record<string, unknown>;
+    sizing?: 'fill';
+    export?: { mode: 'snapshot' | 'svg' };
+  };
+};
+
+// ElementSchema remains the source of truth for runtime validation. This
+// hand-written discriminated union avoids TypeScript recursively expanding the
+// TypeBox schema through nested groups and widgets.
+export type Element =
+  | TextElement
+  | ShapeElement
+  | ImageElement
+  | LineElement
+  | GroupElement
+  | TableElement
+  | WidgetElement;
+
+export type SlideDocument = {
+  $schema?: string;
+  format: typeof SDM_FORMAT;
+  version: typeof SDM_VERSION;
+  size: Size;
+  background: Paint;
+  theme?: Theme;
+  assets?: Record<string, Asset>;
+  elements: Array<Element>;
+  extensions?: Record<string, JsonValue>;
+};
 
 export type SdmIssue = {
   path: string;

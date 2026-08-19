@@ -1,5 +1,6 @@
 import {
   Component,
+  createElement,
   createContext,
   useContext,
   useId,
@@ -34,7 +35,10 @@ import {
   textRunStyle,
 } from './style';
 
-export type WidgetProps = Record<string, JsonValue>;
+// Widget props originate in a JSON document and are validated there. Keeping
+// this boundary as `unknown` avoids forcing React's component generics to
+// recursively expand every possible JSON value during typechecking.
+export type WidgetProps = Record<string, unknown>;
 export type WidgetModule = Record<string, unknown>;
 
 export interface SdmRenderContextValue {
@@ -652,7 +656,17 @@ function WidgetView({
   }
 
   const Widget = candidate;
-  const rendered = <Widget {...(element.widget.props ?? {})} />;
+  const widgetConfig = element.widget as { props?: unknown };
+  const widgetProps =
+    widgetConfig.props &&
+    typeof widgetConfig.props === 'object' &&
+    !Array.isArray(widgetConfig.props)
+      ? (widgetConfig.props as WidgetProps)
+      : {};
+  const rendered = createElement(
+    Widget,
+    widgetProps,
+  );
   const fallback = (
     <WidgetFallback message={`Widget failed to render: ${widgetTarget}`} />
   );
