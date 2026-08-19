@@ -42,13 +42,18 @@ export const videosTable = pgTable("videos", {
   description: text("description"),
   status: videoStatusEnum("status").notNull().default("pending"),
   views: integer("views").notNull().default(0),
+  // Denormalized like count, kept in sync transactionally by the like/unlike
+  // routes (see routes/videos.ts). The source of truth for *who* liked a
+  // video is the video_likes table — this column exists purely so feed/list
+  // queries don't need a COUNT(*) join on every request.
+  likes: integer("likes").notNull().default(0),
   uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
   reviewedAt: timestamp("reviewed_at"),
   reviewedBy: uuid("reviewed_by").references(() => usersTable.id),
 });
 
 export const insertVideoSchema = createInsertSchema(videosTable)
-  .omit({ id: true, code: true, uploadedAt: true, views: true, status: true, reviewedAt: true, reviewedBy: true })
+  .omit({ id: true, code: true, uploadedAt: true, views: true, likes: true, status: true, reviewedAt: true, reviewedBy: true })
   .extend({
     // Server-side enforcement — mirrors the 45s cap already enforced client-side,
     // but the client cannot be trusted, so this is re-checked here.

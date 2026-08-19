@@ -15,6 +15,7 @@ import { Stack, useRouter } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { AuthProvider, useAuth } from '@/context/AuthContext';
 import { LanguageProvider } from '@/context/LanguageContext';
+import '@/lib/api';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -35,6 +36,7 @@ function RootLayoutNav() {
     <Stack screenOptions={{ headerShown: false }}>
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen name="login" options={{ headerShown: false }} />
+      <Stack.Screen name="video/[id]" options={{ headerShown: false, presentation: 'card' }} />
     </Stack>
   );
 }

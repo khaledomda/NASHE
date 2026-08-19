@@ -16,17 +16,27 @@ import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import * as ImagePicker from 'expo-image-picker';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useQueryClient } from '@tanstack/react-query';
 import { useColors } from '@/hooks/useColors';
 import { useLanguage } from '@/context/LanguageContext';
 import { useAuth } from '@/context/AuthContext';
 import { SPORTS, sportName, getSport } from '@/constants/sports';
 import { nextVideoCode } from '@/constants/videos';
+import { apiGetUploadUrl, apiUploadVideoFile, apiSubmitVideo, ApiError } from '@/lib/api';
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
 type PickerOption = { label: string; value: string };
 
 const MAX_VIDEO_SECONDS = 45;
+
+function guessVideoContentType(asset: ImagePicker.ImagePickerAsset): string {
+  if (asset.mimeType) return asset.mimeType;
+  const ext = (asset.fileName ?? asset.uri).split('.').pop()?.toLowerCase();
+  if (ext === 'mov') return 'video/quicktime';
+  if (ext === 'webm') return 'video/webm';
+  return 'video/mp4';
+}
 
 // ─── SelectPicker ─────────────────────────────────────────────────────────────
 
@@ -106,6 +116,7 @@ export default function UploadScreen() {
   const insets = useSafeAreaInsets();
   const { t, row, align, lang } = useLanguage();
   const { canUploadThisWeek, recordUpload } = useAuth();
+  const queryClient = useQueryClient();
 
   const topPad = Platform.OS === 'web' ? 67 : insets.top;
   const bottomPad = Platform.OS === 'web' ? 34 + 50 : 0;
@@ -146,6 +157,7 @@ export default function UploadScreen() {
   const [photos, setPhotos] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [videos, setVideos] = useState<ImagePicker.ImagePickerAsset[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [submitStage, setSubmitStage] = useState<'idle' | 'uploading' | 'registering'>('idle');
   const [moderationState, setModerationState] = useState<'idle' | 'scanning' | 'flagged' | 'passed'>('idle');
 
   const canUpload = canUploadThisWeek();
@@ -185,7 +197,10 @@ export default function UploadScreen() {
       Alert.alert(t('videoTooLong'), rejected.join(', '));
     }
     if (accepted.length > 0) {
-      setVideos((prev) => [...prev, ...accepted]);
+      // Only one video is actually uploaded (one clip per submission) — keep
+      // just the most recent pick so the submit flow below has a single,
+      // unambiguous source of truth.
+      setVideos(accepted.slice(-1));
       // Simulated client-side moderation pass — a real check runs server-side
       // (frame OCR + phone-number pattern match) before the video is queued for admin review.
       setModerationState('scanning');
@@ -201,7 +216,7 @@ export default function UploadScreen() {
 
   const removeVideo = (index: number) => {
     setVideos((prev) => prev.filter((_, i) => i !== index));
-    if (videos.length <= 1) setModerationState('idle');
+    setModerationState('idle');
   };
 
   const handleSubmit = async () => {
@@ -220,23 +235,64 @@ export default function UploadScreen() {
       Alert.alert(t('guardianSectionTitle'), t('guardianConsentRequired'));
       return;
     }
+
+    const asset = videos[0];
+    const durationSec = Math.round((asset.duration ?? 0) / 1000) || 1;
+    const contentType = guessVideoContentType(asset);
+    const regionLabel = REGIONS.find((r) => r.value === region)?.label ?? region;
+
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setSubmitting(true);
-    await new Promise((r) => setTimeout(r, 1200));
-    await recordUpload();
-    setSubmitting(false);
-    Alert.alert(t('uploadSuccess'), t('uploadSuccessDesc'));
-    setAthleteName('');
-    setDate('');
-    setRegion('');
-    setSport('');
-    setGender('');
-    setDescription('');
-    setGuardianPhone('');
-    setGuardianConsent(false);
-    setPhotos([]);
-    setVideos([]);
-    setModerationState('idle');
+    try {
+      // 1. Ask the server for a short-lived presigned upload URL.
+      setSubmitStage('uploading');
+      const { uploadUrl, publicUrl } = await apiGetUploadUrl(contentType);
+
+      // 2. Upload the raw video bytes directly to object storage.
+      await apiUploadVideoFile(uploadUrl, asset.uri, contentType);
+
+      // 3. Register the athlete profile + video row now that the file exists.
+      setSubmitStage('registering');
+      await apiSubmitVideo({
+        athlete: {
+          name: athleteName.trim(),
+          birthDate: date.trim(),
+          region: regionLabel,
+          gender: gender as 'male' | 'female',
+          guardianPhone: guardianPhone.trim(),
+          guardianConsent: true,
+        },
+        sport,
+        durationSec,
+        storageUrl: publicUrl,
+        description: description.trim() || undefined,
+      });
+
+      await recordUpload();
+      queryClient.invalidateQueries({ queryKey: ['videos'] });
+
+      Alert.alert(t('uploadSuccess'), t('uploadSuccessDesc'));
+      setAthleteName('');
+      setDate('');
+      setRegion('');
+      setSport('');
+      setGender('');
+      setDescription('');
+      setGuardianPhone('');
+      setGuardianConsent(false);
+      setPhotos([]);
+      setVideos([]);
+      setModerationState('idle');
+    } catch (err) {
+      const message =
+        err instanceof ApiError
+          ? (err.data as { error?: string } | null)?.error ?? t('uploadFailedGeneric')
+          : t('uploadFailedGeneric');
+      Alert.alert(t('uploadFailedTitle'), message);
+    } finally {
+      setSubmitting(false);
+      setSubmitStage('idle');
+    }
   };
 
   return (
@@ -497,7 +553,12 @@ export default function UploadScreen() {
           disabled={submitting || !canUpload}
         >
           {submitting ? (
-            <ActivityIndicator color="#FFFFFF" />
+            <>
+              <ActivityIndicator color="#FFFFFF" />
+              <Text style={uStyles.submitBtnText}>
+                {submitStage === 'uploading' ? t('uploadingProgress') : t('uploadAll')}
+              </Text>
+            </>
           ) : (
             <>
               <Ionicons name="cloud-upload-outline" size={20} color="#FFFFFF" />

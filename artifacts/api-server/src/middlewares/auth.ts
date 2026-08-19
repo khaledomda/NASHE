@@ -25,6 +25,22 @@ export function requireAuth(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+// Like requireAuth, but never rejects the request — routes that work for
+// both logged-in and anonymous users (e.g. GET /videos/:id, which shows
+// "liked by me" only when a valid token is present) use this instead.
+export function optionalAuth(req: Request, _res: Response, next: NextFunction) {
+  const header = req.headers.authorization;
+  if (header?.startsWith("Bearer ")) {
+    try {
+      req.user = verifyToken(header.slice("Bearer ".length));
+    } catch {
+      // Invalid/expired token on an optional-auth route — fall back to
+      // treating the request as anonymous rather than failing it.
+    }
+  }
+  next();
+}
+
 export function requireRole(...roles: UserRole[]) {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.user) {

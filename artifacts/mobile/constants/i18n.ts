@@ -13,7 +13,7 @@ export const translations = {
     entryScoutDesc: 'تصفح المواهب وتواصل معها',
     entryAdminTitle: 'مشرف',
     entryAdminDesc: 'إدارة المنصة والمحتوى',
-    // Login
+    // Login / register
     username: 'اسم المستخدم',
     password: 'كلمة المرور',
     login: 'تسجيل الدخول',
@@ -21,6 +21,14 @@ export const translations = {
     loginFailed: 'فشل تسجيل الدخول. تحقق من بياناتك.',
     back: 'رجوع',
     language: 'العربية / English',
+    createAccount: 'إنشاء حساب جديد',
+    haveAccount: 'لديك حساب بالفعل؟ تسجيل الدخول',
+    needAccount: 'ليس لديك حساب؟ إنشاء حساب',
+    registerButton: 'إنشاء الحساب',
+    registerFailed: 'فشل إنشاء الحساب. حاول مرة أخرى.',
+    passwordHint: '8 أحرف على الأقل',
+    phoneOptional: 'رقم الهاتف (اختياري)',
+    emailOptional: 'البريد الإلكتروني (اختياري)',
     // Tabs
     tabHome: 'الرئيسية',
     tabUpload: 'رفع',
@@ -37,6 +45,14 @@ export const translations = {
     viewAll: 'عرض الكل',
     noVideos: 'لا توجد مقاطع بعد',
     seconds: 'ث',
+    loadingVideos: 'جاري تحميل المقاطع...',
+    loadVideosError: 'تعذر تحميل المقاطع. اسحب للأسفل لإعادة المحاولة.',
+    // Video detail
+    views: 'مشاهدة',
+    likes: 'إعجاب',
+    like: 'إعجاب',
+    liked: 'أعجبني',
+    videoNotFound: 'المقطع غير متوفر',
     // Upload
     uploadTitle: 'رفع المقطع',
     selectAthlete: 'اختر رياضياً',
@@ -64,6 +80,9 @@ export const translations = {
     moderationFlagged: 'تم رصد نص أو رقم محتمل داخل الفيديو — سيُحال للمراجعة اليدوية',
     moderationPassed: 'اجتاز الفحص الآلي المبدئي — بانتظار مراجعة المشرف',
     videoCode: 'رمز الفيديو',
+    uploadingProgress: 'جاري رفع الفيديو...',
+    uploadFailedTitle: 'فشل الرفع',
+    uploadFailedGeneric: 'حدث خطأ أثناء الرفع. تحقق من الاتصال وحاول مرة أخرى.',
     // Guardian consent
     guardianSectionTitle: 'موافقة ولي الأمر',
     guardianPhone: 'رقم هاتف ولي الأمر / المسؤول',
@@ -112,7 +131,7 @@ export const translations = {
     entryScoutDesc: 'Browse talents and connect',
     entryAdminTitle: 'Admin',
     entryAdminDesc: 'Manage the platform and content',
-    // Login
+    // Login / register
     username: 'Username',
     password: 'Password',
     login: 'Log in',
@@ -120,6 +139,14 @@ export const translations = {
     loginFailed: 'Login failed. Check your details.',
     back: 'Back',
     language: 'العربية / English',
+    createAccount: 'Create a new account',
+    haveAccount: 'Already have an account? Log in',
+    needAccount: "Don't have an account? Create one",
+    registerButton: 'Create account',
+    registerFailed: 'Registration failed. Please try again.',
+    passwordHint: 'At least 8 characters',
+    phoneOptional: 'Phone number (optional)',
+    emailOptional: 'Email (optional)',
     // Tabs
     tabHome: 'Home',
     tabUpload: 'Upload',
@@ -136,6 +163,14 @@ export const translations = {
     viewAll: 'View all',
     noVideos: 'No clips yet',
     seconds: 's',
+    loadingVideos: 'Loading clips...',
+    loadVideosError: "Couldn't load clips. Pull down to retry.",
+    // Video detail
+    views: 'views',
+    likes: 'likes',
+    like: 'Like',
+    liked: 'Liked',
+    videoNotFound: 'This clip is unavailable',
     // Upload
     uploadTitle: 'Upload Clip',
     selectAthlete: 'Select athlete',
@@ -163,6 +198,9 @@ export const translations = {
     moderationFlagged: 'Possible text or number detected — sent for manual review',
     moderationPassed: 'Passed automated check — awaiting admin review',
     videoCode: 'Video code',
+    uploadingProgress: 'Uploading video...',
+    uploadFailedTitle: 'Upload failed',
+    uploadFailedGeneric: 'Something went wrong during upload. Check your connection and try again.',
     // Guardian consent
     guardianSectionTitle: 'Guardian Consent',
     guardianPhone: "Parent's / guardian's phone number",

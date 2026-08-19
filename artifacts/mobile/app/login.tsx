@@ -10,28 +10,34 @@ import {
   View,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { LinearGradient } from 'expo-linear-gradient';
 import * as Haptics from 'expo-haptics';
 import { useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth, UserRole } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
+import { useColors } from '@/hooks/useColors';
 
-const ROLES: { role: UserRole; icon: keyof typeof Ionicons.glyphMap; color: string }[] = [
-  { role: 'visitor', icon: 'person-outline', color: '#0F9D68' },
-  { role: 'scout', icon: 'search-outline', color: '#0369A1' },
-  { role: 'admin', icon: 'shield-checkmark-outline', color: '#7C3AED' },
+const ROLES: { role: UserRole; icon: keyof typeof Ionicons.glyphMap }[] = [
+  { role: 'visitor', icon: 'person-outline' },
+  { role: 'scout', icon: 'search-outline' },
+  { role: 'admin', icon: 'shield-checkmark-outline' },
 ];
 
 export default function LoginScreen() {
   const router = useRouter();
   const insets = useSafeAreaInsets();
-  const { login } = useAuth();
+  const colors = useColors();
+  const { login, register } = useAuth();
   const { t, row, align, toggleLang } = useLanguage();
 
   const [step, setStep] = useState<'entry' | 'form'>('entry');
+  const [mode, setMode] = useState<'login' | 'register'>('login');
   const [selectedRole, setSelectedRole] = useState<UserRole | null>(null);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -40,6 +46,7 @@ export default function LoginScreen() {
     role === 'visitor' ? t('entryVisitorTitle') : role === 'scout' ? t('entryScoutTitle') : t('entryAdminTitle');
   const roleDesc = (role: UserRole) =>
     role === 'visitor' ? t('entryVisitorDesc') : role === 'scout' ? t('entryScoutDesc') : t('entryAdminDesc');
+  const roleColor = (role: UserRole) => (role === 'visitor' ? colors.primary : role === 'scout' ? colors.scout : colors.admin);
 
   const chooseRole = (role: UserRole) => {
     Haptics.selectionAsync();
@@ -47,25 +54,42 @@ export default function LoginScreen() {
     setStep('form');
   };
 
-  const handleLogin = async () => {
-    if (!username.trim() || !password.trim() || !selectedRole) {
+  const resetFormFields = () => {
+    setError('');
+    setPassword('');
+  };
+
+  const handleSubmit = async () => {
+    if (!selectedRole) return;
+    if (!username.trim() || !password.trim()) {
       setError(t('loginError'));
       return;
     }
     setError('');
     setLoading(true);
     await Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
-    const success = await login(username, password, selectedRole);
+
+    const errorMessage =
+      mode === 'login'
+        ? await login(username, password)
+        : await register({ username, password, role: selectedRole, phone: phone || undefined, email: email || undefined });
+
     setLoading(false);
-    if (success) {
+    if (errorMessage === null) {
       router.replace('/(tabs)');
     } else {
-      setError(t('loginFailed'));
+      setError(errorMessage);
     }
   };
 
   return (
     <KeyboardAvoidingView style={styles.root} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+      <LinearGradient
+        colors={[colors.gradientStart, colors.gradientEnd]}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+        style={StyleSheet.absoluteFill}
+      />
       <View style={[styles.container, { paddingTop: insets.top + 48, paddingBottom: insets.bottom + 40 }]}>
         {/* Trial banner */}
         <View style={styles.trialBanner}>
@@ -76,7 +100,7 @@ export default function LoginScreen() {
         {/* Logo */}
         <View style={styles.logoContainer}>
           <View style={styles.logoCircle}>
-            <Ionicons name="trophy" size={40} color="#0F9D68" />
+            <Ionicons name="trophy" size={40} color={colors.primary} />
           </View>
         </View>
 
@@ -89,13 +113,10 @@ export default function LoginScreen() {
             {ROLES.map((r) => (
               <Pressable
                 key={r.role}
-                style={({ pressed }) => [
-                  styles.roleCard,
-                  { flexDirection: row, opacity: pressed ? 0.85 : 1 },
-                ]}
+                style={({ pressed }) => [styles.roleCard, { flexDirection: row, opacity: pressed ? 0.85 : 1 }]}
                 onPress={() => chooseRole(r.role)}
               >
-                <View style={[styles.roleIconWrap, { backgroundColor: r.color }]}>
+                <View style={[styles.roleIconWrap, { backgroundColor: roleColor(r.role) }]}>
                   <Ionicons name={r.icon} size={22} color="#FFFFFF" />
                 </View>
                 <View style={styles.roleTextWrap}>
@@ -112,7 +133,13 @@ export default function LoginScreen() {
           </View>
         ) : (
           <View style={styles.form}>
-            <Pressable style={[styles.backRow, { flexDirection: row }]} onPress={() => setStep('entry')}>
+            <Pressable
+              style={[styles.backRow, { flexDirection: row }]}
+              onPress={() => {
+                setStep('entry');
+                resetFormFields();
+              }}
+            >
               <Ionicons name={row === 'row-reverse' ? 'chevron-forward' : 'chevron-back'} size={16} color="rgba(255,255,255,0.8)" />
               <Text style={styles.backText}>{selectedRole ? roleTitle(selectedRole) : ''}</Text>
             </Pressable>
@@ -121,36 +148,81 @@ export default function LoginScreen() {
               <TextInput
                 style={[styles.input, { textAlign: align }]}
                 placeholder={t('username')}
-                placeholderTextColor="rgba(27,94,59,0.5)"
+                placeholderTextColor="rgba(11,18,32,0.4)"
                 value={username}
                 onChangeText={setUsername}
                 autoCapitalize="none"
               />
-              <Ionicons name="person-outline" size={20} color="#0F9D68" />
+              <Ionicons name="person-outline" size={20} color={colors.primary} />
             </View>
 
             <View style={[styles.inputWrapper, { flexDirection: row }]}>
               <TextInput
                 style={[styles.input, { textAlign: align }]}
                 placeholder={t('password')}
-                placeholderTextColor="rgba(27,94,59,0.5)"
+                placeholderTextColor="rgba(11,18,32,0.4)"
                 value={password}
                 onChangeText={setPassword}
                 secureTextEntry={!showPassword}
               />
               <Pressable onPress={() => setShowPassword((v) => !v)}>
-                <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color="#0F9D68" />
+                <Ionicons name={showPassword ? 'eye-off-outline' : 'eye-outline'} size={20} color={colors.primary} />
               </Pressable>
             </View>
+
+            {mode === 'register' && (
+              <>
+                <View style={[styles.inputWrapper, { flexDirection: row }]}>
+                  <TextInput
+                    style={[styles.input, { textAlign: align }]}
+                    placeholder={t('phoneOptional')}
+                    placeholderTextColor="rgba(11,18,32,0.4)"
+                    value={phone}
+                    onChangeText={setPhone}
+                    keyboardType="phone-pad"
+                  />
+                  <Ionicons name="call-outline" size={20} color={colors.primary} />
+                </View>
+                <View style={[styles.inputWrapper, { flexDirection: row }]}>
+                  <TextInput
+                    style={[styles.input, { textAlign: align }]}
+                    placeholder={t('emailOptional')}
+                    placeholderTextColor="rgba(11,18,32,0.4)"
+                    value={email}
+                    onChangeText={setEmail}
+                    autoCapitalize="none"
+                    keyboardType="email-address"
+                  />
+                  <Ionicons name="mail-outline" size={20} color={colors.primary} />
+                </View>
+                <Text style={styles.hintText}>{t('passwordHint')}</Text>
+              </>
+            )}
 
             {!!error && <Text style={styles.errorText}>{error}</Text>}
 
             <Pressable
-              style={({ pressed }) => [styles.loginBtn, pressed && styles.loginBtnPressed]}
-              onPress={handleLogin}
+              style={({ pressed }) => [styles.submitBtn, pressed && styles.submitBtnPressed]}
+              onPress={handleSubmit}
               disabled={loading}
             >
-              {loading ? <ActivityIndicator color="#0F9D68" /> : <Text style={styles.loginBtnText}>{t('login')}</Text>}
+              {loading ? (
+                <ActivityIndicator color={colors.primary} />
+              ) : (
+                <Text style={[styles.submitBtnText, { color: colors.primary }]}>
+                  {mode === 'login' ? t('login') : t('registerButton')}
+                </Text>
+              )}
+            </Pressable>
+
+            <Pressable
+              onPress={() => {
+                setMode(mode === 'login' ? 'register' : 'login');
+                resetFormFields();
+              }}
+              style={styles.switchModeBtn}
+            >
+              <Text style={styles.switchModeText}>{mode === 'login' ? t('needAccount') : t('haveAccount')}</Text>
             </Pressable>
           </View>
         )}
@@ -164,8 +236,8 @@ export default function LoginScreen() {
 }
 
 const styles = StyleSheet.create({
-  root: { flex: 1, backgroundColor: '#0F9D68' },
-  container: { flex: 1, alignItems: 'center', paddingHorizontal: 24, backgroundColor: '#0F9D68' },
+  root: { flex: 1 },
+  container: { flex: 1, alignItems: 'center', paddingHorizontal: 24 },
   trialBanner: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -201,7 +273,7 @@ const styles = StyleSheet.create({
   },
   tagline: {
     fontSize: 13,
-    color: 'rgba(255,255,255,0.8)',
+    color: 'rgba(255,255,255,0.85)',
     marginBottom: 28,
     textAlign: 'center',
     paddingHorizontal: 12,
@@ -210,50 +282,53 @@ const styles = StyleSheet.create({
   roleList: { width: '100%', gap: 12 },
   chooseTitle: {
     fontSize: 14,
-    color: 'rgba(255,255,255,0.85)',
+    color: 'rgba(255,255,255,0.9)',
     fontFamily: 'Inter_600SemiBold',
     marginBottom: 4,
   },
   roleCard: {
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.12)',
-    borderRadius: 16,
+    backgroundColor: 'rgba(255,255,255,0.14)',
+    borderRadius: 18,
     padding: 14,
     gap: 12,
   },
   roleIconWrap: {
     width: 44,
     height: 44,
-    borderRadius: 12,
+    borderRadius: 14,
     alignItems: 'center',
     justifyContent: 'center',
   },
   roleTextWrap: { flex: 1 },
   roleTitle: { color: '#FFFFFF', fontSize: 15, fontFamily: 'Inter_600SemiBold' },
-  roleDesc: { color: 'rgba(255,255,255,0.7)', fontSize: 12, fontFamily: 'Inter_400Regular', marginTop: 2 },
+  roleDesc: { color: 'rgba(255,255,255,0.72)', fontSize: 12, fontFamily: 'Inter_400Regular', marginTop: 2 },
   form: { width: '100%', gap: 14 },
   backRow: { alignItems: 'center', gap: 6, marginBottom: 4 },
   backText: { color: 'rgba(255,255,255,0.85)', fontSize: 14, fontFamily: 'Inter_600SemiBold' },
   inputWrapper: {
     alignItems: 'center',
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 14,
     paddingHorizontal: 16,
     height: 52,
     gap: 10,
   },
-  input: { flex: 1, fontSize: 15, color: '#111827', fontFamily: 'Inter_400Regular' },
-  errorText: { color: '#FCA5A5', fontSize: 13, textAlign: 'center', fontFamily: 'Inter_400Regular' },
-  loginBtn: {
+  input: { flex: 1, fontSize: 15, color: '#0B1220', fontFamily: 'Inter_400Regular' },
+  hintText: { color: 'rgba(255,255,255,0.65)', fontSize: 11, fontFamily: 'Inter_400Regular', marginTop: -6 },
+  errorText: { color: '#FFD1D6', fontSize: 13, textAlign: 'center', fontFamily: 'Inter_400Regular' },
+  submitBtn: {
     backgroundColor: '#FFFFFF',
-    borderRadius: 12,
+    borderRadius: 14,
     height: 52,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: 6,
   },
-  loginBtnPressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
-  loginBtnText: { color: '#0F9D68', fontSize: 16, fontWeight: '700' as const, fontFamily: 'Inter_700Bold' },
+  submitBtnPressed: { opacity: 0.85, transform: [{ scale: 0.98 }] },
+  submitBtnText: { fontSize: 16, fontWeight: '700' as const, fontFamily: 'Inter_700Bold' },
+  switchModeBtn: { alignItems: 'center', paddingVertical: 4 },
+  switchModeText: { color: 'rgba(255,255,255,0.85)', fontSize: 13, fontFamily: 'Inter_500Medium' },
   langToggle: { marginTop: 'auto', paddingVertical: 12 },
   langText: { color: 'rgba(255,255,255,0.65)', fontSize: 13, fontFamily: 'Inter_400Regular' },
 });
